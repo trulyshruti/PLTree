@@ -1,2 +1,3 @@
 type expr =
-	Lit of int
+	Lit of string
+|	Int of int

@@ -1,6 +1,9 @@
 %{ open Ast %}
 
-%token <int> LITERAL
+%token <string>  LITERAL
+%token <int> 	 INT
+%token EOF
+
 
 
 
@@ -13,4 +16,6 @@
 
 expr:
 	LITERAL	{Lit($1)}
-
+|	INT 	{Int($1)}
+|	LITERAL	expr	{Lit($1)}
+|	INT expr 	{Int($1)}
