@@ -15,7 +15,6 @@
 
 
 expr:
-	LITERAL	{Lit($1)}
-|	INT 	{Int($1)}
-|	LITERAL	expr	{Lit($1)}
-|	INT expr 	{Int($1)}
+	LITERAL		{Lit($1)}
+|	INT 		{Int($1)}
+|	expr expr	{Seq($1, $2)}
