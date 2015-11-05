@@ -1,0 +1,25 @@
+EXPR -> VARIABLE EXPR
+| FUNC_DEC EXPR
+| FUNC_CALL EXPR
+| ASSN EXPR
+| {}
+
+VARIABLE -> 
+| (TYPE ID)
+| (TYPE ID TREE)
+
+FUNC_DEC -> (void ID VARIABLE (EXPR))
+			(TYPE ID VARIABLE (EXPR RETURN))
+
+TREE -> (LITERAL) | (LITERAL TREE) | 
+		(LITERAL) TREE | 
+		(ID) | (ID TREE) | (ID) TREE | 
+		(FUNC_CALL) | (FUNC_CALL TREE) | 
+		(FUNC_CALL) TREE
+
+ASSN -> (ID TREE)
+
+LITERAL -> LITERAL LITERAL | '['a'-'z']?' | "['a'-'z']*" | 
+			[0-9]* | (LITERAL)
+
+ID -> ['a'-'z'|_]['a'-'z'|symbols|0-9]*
