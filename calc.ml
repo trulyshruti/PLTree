@@ -10,7 +10,8 @@ let rec eval = function
 |	Int(x) -> print_endline (string_of_int (x/2))
 |	Flt(x) -> print_endline (string_of_float (sqrt x))
 |	Str(x) -> print_endline x
-|	FunCall(x, y) -> print_endline (strip_both_chars y)
+|	FunCall("print", y) -> print_endline (strip_both_chars y)
+|	FunCall(x, y) -> print_endline ("call: " ^ x ^ " on " ^ y)
 |	Seq(v1, v2) -> eval v1; eval v2
 
 
