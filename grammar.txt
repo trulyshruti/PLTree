@@ -19,7 +19,7 @@ TREE -> (LITERAL) | (LITERAL TREE) |
 
 ASSN -> (ID TREE)
 
-LITERAL -> LITERAL LITERAL | '['a'-'z']'' | "['a'-'z']"* | 
+LITERAL -> LITERAL LITERAL | '['a'-'z']?' | "['a'-'z']*" | 
 			[0-9]* | (LITERAL)
 
-ID -> ['a'-z'|_]+['a'-'z']_-symbols|[0-9]*
+ID -> ['a'-'z'|_]['a'-'z'|symbols|0-9]*
