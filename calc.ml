@@ -2,7 +2,10 @@ open Ast
 
 let rec eval = function 
 	Lit(x) -> print_endline x
-|	Int(x) -> print_endline (string_of_int x)
+|	Int(x) -> print_endline (string_of_int (x/2))
+|	Flt(x) -> print_endline (string_of_float (sqrt x))
+|	Str(x) -> print_endline x
+|	FunCall(x, y) -> print_endline ("calling \"" ^ x ^ "\" on \"" ^ y ^ "\"")
 |	Seq(v1, v2) -> eval v1; eval v2
 
 
