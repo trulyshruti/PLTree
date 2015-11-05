@@ -31,7 +31,8 @@
 
 
 expr:
-	LPAREN ID LITERAL RPAREN	{FunCall($2, $3)}
+	LPAREN expr RPAREN {$2}
+|	LPAREN ID LITERAL RPAREN	{FunCall($2, $3)}
 |	LPAREN ID ID RPAREN		{FunCall($2, $3)}
 |	STRING_LITERAL			{Str($1)}
 |	INT_LITERAL			{Int($1)}
