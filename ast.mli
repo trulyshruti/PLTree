@@ -1,3 +1,8 @@
+type literal =
+	Flt of float
+|	Str of string
+|	Int of int
+
 type expr =
 	Lit of string
 |	Int of int

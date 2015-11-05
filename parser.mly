@@ -27,14 +27,18 @@
 %type < Ast.expr> expr
 
 %%
-
-
+/*
+literal:
+	INT_LITERAL 			{$1}
+|	FLOAT_LITERAL			{$1}
+|	STRING_LITERAL			{$1}
+*/
 
 expr:
-	LPAREN expr RPAREN {$2}
-|	LPAREN ID LITERAL RPAREN	{FunCall($2, $3)}
+	LPAREN expr RPAREN 		{$2}
+|	LPAREN ID STRING_LITERAL RPAREN	{FunCall($2, $3)}
 |	LPAREN ID ID RPAREN		{FunCall($2, $3)}
 |	STRING_LITERAL			{Str($1)}
 |	INT_LITERAL			{Int($1)}
 |	FLOAT_LITERAL			{Flt($1)}
-|	expr expr	{Seq($1, $2)}
+|	expr expr			{Seq($1, $2)}
