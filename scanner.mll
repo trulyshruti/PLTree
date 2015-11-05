@@ -30,7 +30,7 @@ rule token = parse
 | "double" 		{ DOUBLE }
 | ['0'-'9']+ as lxm 	{ INT_LITERAL(int_of_string lxm) }
 | ['0'-'9']+'.'['0'-'9']+ as lxm { FLOAT_LITERAL(float_of_string lxm) }
-| '"'[^'\n''"']*'"' as lxm { STRING_LITERAL(lxm) }
+| '"'([^'\n''"']|"\\\"")*'"' as lxm { STRING_LITERAL(lxm) }
 | ['a'-'z' 'A'-'Z']['a'-'z' 'A'-'Z' '0'-'9' '_']* as lxm { ID(lxm) }
 | eof { EOF }
 | _ as char { raise (Failure("illegal character " ^ Char.escaped char)) }
