@@ -1,12 +1,6 @@
-type literal =
-	Flt of float
-|	Str of string
-|	Int of int
-
 type expr =
 	Lit of string
-|	Int of int
-|	Str of string
-|	Flt of float
-|	FunCall of string * string
+|	FunCall of string * expr
+|	While of expr * expr
 |	Seq of expr * expr
+|	IntVarDec of string * expr

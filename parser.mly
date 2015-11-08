@@ -6,9 +6,6 @@
 %token EQ NEQ LT LEQ GT GEQ
 %token RETURN IF IFELSE FOR WHILE INT CHAR BOOL DOUBLE VOID
 %token <string> LITERAL
-%token <int> INT_LITERAL
-%token <float> FLOAT_LITERAL
-%token <string> STRING_LITERAL
 %token <string> ID
 %token EOF
 
@@ -21,24 +18,15 @@
 %left TIMES DIVIDE
 
 
-
-
 %start expr
 %type < Ast.expr> expr
 
 %%
-/*
-literal:
-	INT_LITERAL 			{$1}
-|	FLOAT_LITERAL			{$1}
-|	STRING_LITERAL			{$1}
-*/
 
 expr:
-	LPAREN expr RPAREN 		{$2}
-|	LPAREN ID STRING_LITERAL RPAREN	{FunCall($2, $3)}
-|	LPAREN ID ID RPAREN		{FunCall($2, $3)}
-|	STRING_LITERAL			{Str($1)}
-|	INT_LITERAL			{Int($1)}
-|	FLOAT_LITERAL			{Flt($1)}
-|	expr expr			{Seq($1, $2)}
+	LPAREN expr RPAREN 				{$2}
+|	LPAREN ID expr RPAREN				{FunCall($2, $3)}
+|	LPAREN WHILE expr LPAREN expr RPAREN RPAREN	{While($3, $5)}
+|	LITERAL						{Lit($1)}
+|	LPAREN INT ID expr RPAREN			{IntVarDec($3, $4)}
+|	expr expr					{Seq($1, $2)}
