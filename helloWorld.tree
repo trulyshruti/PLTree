@@ -1,21 +1,2 @@
-(void print (void instring) (
-	(int i 0)
-
-	(while (i < (width instring)) (
-		(void node instring[i])
-
-		(ifelse (isleaf node)
-			(
-				(putchar node)
-			)
-
-			(
-				(print node)
-			)
-		)
-
-		(i (i+1))
-	))
-))
-
-(print “Hello, World!\n”)
+(print "Hello, World!\n")
+(print "Program completed\n")
