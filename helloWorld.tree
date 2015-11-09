@@ -1,2 +1,7 @@
-(print "Hello, World!\n")
-(print "Program completed\n")
+(int a 3)
+(int b 3)
+
+(while (a == b) (
+	(print "Hello, World!\n")
+	(= a 5)
+))

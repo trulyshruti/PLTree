@@ -4,3 +4,5 @@ type expr =
 |	While of expr * expr
 |	Seq of expr * expr
 |	IntVarDec of string * expr
+|	Eq of string * string
+|	Assn of string * expr

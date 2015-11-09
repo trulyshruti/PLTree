@@ -1,11 +1,13 @@
 open Ast
 
 let rec eval = function 
-	Lit(x) -> x
+	Lit(x) -> "" ^ x
 |	FunCall(x, y) -> ("" ^ x ^ "(" ^ eval y ^ ")")
 |	While(x, y) -> "while ("^ eval x ^ ") {\n" ^ eval y ^ ";\n}"
 |	Seq(v1, v2) -> "" ^ eval v1 ^ ";\n" ^ eval v2 ^ ";\n"
 |	IntVarDec(v2, v3) -> "int " ^ v2 ^ " = " ^ eval v3 ^ ";\n"
+|	Eq(v1, v2) -> "" ^ v1 ^ " == " ^ v2
+|	Assn(v1, v2) -> "" ^ v1 ^ " = " ^ eval v2 ^ ";\n"
 
 let _ = 
 	let lexbuf = Lexing.from_channel stdin in
