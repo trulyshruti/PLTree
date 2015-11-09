@@ -17,7 +17,7 @@ parser.ml parser.mli : parser.mly
 %.cmi : %.mli
 	ocamlc -c $<
 
-hello:
+hello: calc
 	cat helloWorld.tree | ./calc > out.c; gcc -o hello out.c
 
 calculator.tar.gz : $(TARFILES)
