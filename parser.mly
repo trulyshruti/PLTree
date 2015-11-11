@@ -26,9 +26,11 @@
 expr:
 	LPAREN expr RPAREN 				{$2}
 |	LPAREN ID expr RPAREN				{FunCall($2, $3)}
-|	LPAREN WHILE expr  expr  RPAREN			{While($3, $4)}
+|	LPAREN WHILE LPAREN expr RPAREN expr RPAREN	{While($4, $6)}
 |	LITERAL						{Lit($1)}
 |	LPAREN INT ID expr RPAREN			{IntVarDec($3, $4)}
 |	ID EQ ID					{Eq($1, $3)}
+|	ID LT ID					{Lt($1, $3)}
 |	LPAREN ASSIGN ID expr RPAREN			{Assn($3, $4)}
+|	LPAREN ID PLUS ID RPAREN			{Add($2, $4)}
 |	expr expr					{Seq($1, $2)}

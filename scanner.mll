@@ -28,8 +28,9 @@ rule token = parse
 | "bool"  	 	{ BOOL }
 | "void"   		{ VOID }
 | "double" 		{ DOUBLE }
-| ['0'-'9']+ as lxm 	{ LITERAL(lxm) }
-| ['0'-'9']+'.'['0'-'9']+ as lxm { LITERAL(lxm) }
+| "'"[^'\n']"'" as lxm	{ LITERAL(lxm) }
+| '-'?['0'-'9']+ as lxm 	{ LITERAL(lxm) }
+| '-'?['0'-'9']+'.'['0'-'9']+ as lxm { LITERAL(lxm) }
 | '"'([^'\n''"']|"\\\"")*'"' as lxm { LITERAL(lxm) }
 | ['a'-'z' 'A'-'Z']['a'-'z' 'A'-'Z' '0'-'9' '_']* as lxm { ID(lxm) }
 | eof { EOF }

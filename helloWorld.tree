@@ -1,16 +1,12 @@
-(int a 3)
-(int b 3)
+(int a 0)
+(int b 0)
 
-(while (a == b) (
-	(print "Hello, World!\n")
-	(= a 5)
-))
+(int c 1)
+(= a 10)
 
-(= b 5)
-
-(while (b == a)
-	(print "Done\n")
-	(= b 3)
+(while (b < a)
+	(print "Hello, ")
+	(print "World!\n")
+	(= b (b + c))
 )
 
-(print "Goodbye!\n")
