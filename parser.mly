@@ -18,19 +18,34 @@
 %left TIMES DIVIDE
 
 
-%start expr
-%type < Ast.expr> expr
+%start program
+%type < Ast.program> program
 
 %%
 
+program: 
+	stmt program 	{$1 :: $2}
+|	EOF		{[]}
+
+vtype:
+	INT		{Int}
+|	CHAR		{Char}
+|	DOUBLE		{Double}
+|	BOOL		{Bool}
+
+stmt_list:
+			{[]}
+|	stmt_list stmt 	{$2 :: $1}
+
+stmt:
+	LPAREN WHILE LPAREN expr RPAREN stmt_list RPAREN 		{While($4, Seq($6))}
+|	LPAREN vtype ID expr RPAREN				{VarDec($2, $3, $4)}
+|	LPAREN ASSIGN ID expr RPAREN				{Assn($3, $4)}
+|	expr							{Expr($1)}
+
 expr:
-	LPAREN expr RPAREN 				{$2}
 |	LPAREN ID expr RPAREN				{FunCall($2, $3)}
-|	LPAREN WHILE LPAREN expr RPAREN expr RPAREN	{While($4, $6)}
 |	LITERAL						{Lit($1)}
-|	LPAREN INT ID expr RPAREN			{IntVarDec($3, $4)}
 |	ID EQ ID					{Eq($1, $3)}
 |	ID LT ID					{Lt($1, $3)}
-|	LPAREN ASSIGN ID expr RPAREN			{Assn($3, $4)}
 |	LPAREN ID PLUS ID RPAREN			{Add($2, $4)}
-|	expr expr					{Seq($1, $2)}
