@@ -1,12 +1,8 @@
 (int a 0)
-(int b 0)
 
-(int c 1)
-(= a 10)
-
-(while (b < a)
+(while (a < 10)
 	(print "Hello, ")
 	(print "World!\n")
-	(= b (b + c))
+	(= a (a + 1))
 )
 

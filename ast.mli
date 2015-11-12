@@ -5,9 +5,10 @@ type vtype =
 type expr =
 	Lit of string
 |	FunCall of string * expr
-|	Eq of string * string
-|	Lt of string * string
-|	Add of string * string
+|	Eq of expr * expr
+|	Lt of expr * expr
+|	Add of expr * expr
+|	Id of string
 
 type stmt = 
 	While of expr * stmt
