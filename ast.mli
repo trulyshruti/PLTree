@@ -1,9 +1,9 @@
-
 type vtype =
 	Int | Char | Double | Bool
 
 type expr =
-	Lit of string
+	Tree of expr * expr list
+|	Lit of string
 |	FunCall of string * expr
 |	Eq of expr * expr
 |	Lt of expr * expr
@@ -16,6 +16,8 @@ type stmt =
 |	Assn of string * expr
 |	Expr of expr
 |	Seq of stmt list
+
+
 
 
 type program = stmt list

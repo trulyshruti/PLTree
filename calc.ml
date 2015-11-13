@@ -29,9 +29,6 @@ let rec gen_c = function n -> function
 			|	[] -> "" in
 		gen_c_seq v1
 
-let rec gen_c_prog = function
-	hd::tl -> "" ^ gen_c 0 hd ^ "\n" ^ gen_c_prog tl
-|	[] -> ""
 
 
 
@@ -39,6 +36,11 @@ let rec gen_c_prog = function
 
 let rec eval_expr = function 
 	Lit(x) -> "Lit(" ^ x ^ ")"
+|	Tree(x, y) -> let rec eval_tree_list = function
+				hd::tl -> "Tree(" ^ eval_expr hd ^ ", [])::" ^ eval_tree_list tl
+			|	[] -> "[]"
+			in
+			"Tree(" ^ (eval_expr x) ^ ", " ^ eval_tree_list y ^ ")"
 |	FunCall(x, y) -> ("FunCall(" ^ x ^ ", " ^  (eval_expr y) ^ ")")
 |	Eq(v1, v2) -> ("Eq(" ^ eval_expr v1 ^ ", " ^ eval_expr v2 ^ ")")
 |	Lt(v1, v2) -> ("Lt(" ^ eval_expr v1 ^ ", " ^ eval_expr v2 ^ ")")
@@ -65,7 +67,7 @@ let rec eval_prog = function
 
 
 let rec gen_c_prog = function
-	hd::tl -> "" ^ gen_c 1 hd ^ "\n" ^ gen_c_prog tl
+	hd::tl -> "" ^ gen_c 1 hd ^ ";\n" ^ gen_c_prog tl
 |	[] -> ""
 
 let get_c = function
@@ -73,7 +75,7 @@ let get_c = function
 		"void print(char *str){printf(\"%s\", str);}\n" ^
 		"int main(int argc, char **argv) {\n" ^
 		gen_c_prog prog ^
-		"}"
+		"\treturn 0;\n}"
 
 let _ = 
 	let lexbuf = Lexing.from_channel stdin in

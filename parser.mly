@@ -33,6 +33,7 @@ vtype:
 |	DOUBLE		{Double}
 |	BOOL		{Bool}
 
+
 stmt_list:
 			{[]}
 |	stmt stmt_list 	{$1 :: $2}
@@ -44,8 +45,13 @@ stmt:
 |	expr							{Expr($1)}
 |	LPAREN stmt RPAREN					{$2}
 
+expr_list:
+				{[]}
+|	LPAREN expr RPAREN expr_list		{$2 :: $4}
+
 expr:
-|	LPAREN ID expr RPAREN				{FunCall($2, $3)}
+	LPAREN ID expr RPAREN				{FunCall($2, $3)}
+|	expr expr_list 					{Tree($1, $2)}
 |	LITERAL						{Lit($1)}
 |	ID						{Id($1)}
 |	expr EQ expr					{Eq($1, $3)}

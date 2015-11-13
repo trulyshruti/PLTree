@@ -1,34 +1,39 @@
 #include <stdio.h>
+#include "tree.h"
 
-typedef enum {INT, CHAR, DOUBLE, BOOL, VOID, TREE} data_type;
-
-struct tree {
-	data_type type;
-	void *data;
-	struct tree *children;
-	struct tree *sibling;
-};
 
 void init_tree(struct tree *root) {
 	root->data = NULL;
 	root->children = NULL;
 	root->sibling = NULL;
+	root->width = 0;
 }
 
 
-void add_sibling (struct tree *root, struct tree *sibling) {
+int add_sibling (struct tree *root, struct tree *sibling, int n) {
+	if (root == NULL)
+		return -1;
 	if (root->sibling == NULL) {
 		root->sibling = sibling;
+		return n;
 	} else {
-		add_sibling(root->sibling, sibling);
+		return add_sibling(root->sibling, sibling, n+1);
 	}
+
 }
 
-void add_child (struct tree *root, struct tree *child) {
+int add_child (struct tree *root, struct tree *child) {
+	if (root == NULL) {
+		return -1;
+	}
 	if (root->children == NULL) {
 		root->children = child;
+		root->width = 1;
+		return 1;
 	} else {
-		add_sibling(root->children, child);
+		int n = add_sibling(root->children, child, root->width);
+		root->width = n;
+		return n;
 	}
 }
 
