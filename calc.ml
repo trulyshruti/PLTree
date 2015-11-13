@@ -10,6 +10,11 @@ let rec string_tab n v = if n == 0 then v else string_tab (n-1) ("\t" ^ v)
 let rec gen_c_expr = function 
 	Lit(x) -> x
 |	FunCall(x, y) -> ("" ^ x ^ "(" ^  (gen_c_expr y) ^ ")")
+|	Tree(x, y) -> let rec gen_c_tree_list = function
+				hd::tl -> "treemake(" ^ gen_c_expr hd ^ ", NULL), " ^ gen_c_tree_list tl
+			|	[] -> "NULL"
+			in
+			"treemake(" ^ (gen_c_expr x) ^ ")"
 |	Eq(v1, v2) -> ("(" ^ gen_c_expr v1 ^ ") == (" ^ gen_c_expr v2 ^ ")")
 |	Lt(v1, v2) -> ("(" ^ gen_c_expr v1 ^ ") < (" ^ gen_c_expr v2 ^ ")")
 |	Add(v1, v2) -> ("(" ^ gen_c_expr v1 ^ ") + (" ^ gen_c_expr v2 ^ ")")
@@ -18,10 +23,10 @@ let rec gen_c_expr = function
 let rec gen_c = function n -> function
 	While(x, y) -> string_tab n ("while ("^(gen_c_expr x) ^ ") { \n" ^ (gen_c (n+1) y) ^ "\n" ^  string_tab n "}")
 |	VarDec(v1, v2, v3) -> (match v1 with
-				Int -> string_tab n ("int " ^ v2 ^ " = " ^ gen_c_expr v3 ^ ";")
-			|	Char -> string_tab n ("char " ^ v2 ^ " = " ^ gen_c_expr v3 ^ ";")
-			|	Double -> string_tab n ("double " ^ v2 ^ ", " ^ gen_c_expr v3 ^ ";")
-			|	Bool -> string_tab n ("bool " ^ v2 ^ " = " ^ gen_c_expr v3 ^ ";"))
+				Int -> string_tab n ("struct tree * " ^ v2 ^ " = " ^ gen_c_expr v3 ^ ";")
+			|	Char -> string_tab n ("struct tree * " ^ v2 ^ " = " ^ gen_c_expr v3 ^ ";")
+			|	Double -> string_tab n ("struct tree * " ^ v2 ^ ", " ^ gen_c_expr v3 ^ ";")
+			|	Bool -> string_tab n ("struct tree * " ^ v2 ^ " = " ^ gen_c_expr v3 ^ ";"))
 |	Assn(v1, v2) -> string_tab n ("" ^ v1 ^ " = " ^ gen_c_expr v2 ^ ";")
 |	Expr(v1) -> string_tab n (gen_c_expr v1)
 |	Seq(v1) -> let rec gen_c_seq = function
@@ -70,9 +75,18 @@ let rec gen_c_prog = function
 	hd::tl -> "" ^ gen_c 1 hd ^ ";\n" ^ gen_c_prog tl
 |	[] -> ""
 
+let print_func = "void print(struct tree *str) {\n" ^ 
+		 "	int width = str->width;\n" ^ 
+		 "	int i = 0;\n" ^
+		 "	while (i < width) {\n " ^
+		 "		putchar(*(char *)(get_branch(str, i)->data)); \n" ^
+		 "		i++; \n" ^ 
+		 "	}\n" ^
+		 "	putchar('\\n');\n " ^
+		 "}\n"
+
 let get_c = function
 	prog -> "#include <stdio.h>\n#include <stdlib.h>\n#include \"tree.h\"\n" ^
-		"void print(char *str){printf(\"%s\", str);}\n" ^
 		"int main(int argc, char **argv) {\n" ^
 		gen_c_prog prog ^
 		"\treturn 0;\n}"

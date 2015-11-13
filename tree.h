@@ -11,7 +11,10 @@ struct tree {
 	struct tree *sibling;
 };
 
+void print (struct tree *str);
+
 void init_tree (struct tree *root);
+struct tree *treemake (char *str);
 int add_sibling (struct tree *root, struct tree *sibling, int n);
 int add_child (struct tree *root, struct tree *child);
 void set_type (struct tree *root, data_type type);

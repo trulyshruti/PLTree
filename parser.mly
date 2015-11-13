@@ -52,7 +52,7 @@ expr_list:
 expr:
 	LPAREN ID expr RPAREN				{FunCall($2, $3)}
 |	expr expr_list 					{Tree($1, $2)}
-|	LITERAL						{Lit($1)}
+|	LITERAL						{Tree(Lit($1), [])}
 |	ID						{Id($1)}
 |	expr EQ expr					{Eq($1, $3)}
 |	expr LT expr					{Lt($1, $3)}
