@@ -46,12 +46,12 @@ stmt:
 |	LPAREN stmt RPAREN					{$2}
 
 expr_list:
-				{[]}
-|	LPAREN expr RPAREN expr_list		{$2 :: $4}
+						{[]}
+|	LPAREN LITERAL RPAREN expr_list		{Lit($2) :: $4}
 
 expr:
 	LPAREN ID expr RPAREN				{FunCall($2, $3)}
-|	expr expr_list 					{Tree($1, $2)}
+|	LITERAL expr_list 				{Tree(Lit($1), $2)}
 |	LITERAL						{Tree(Lit($1), [])}
 |	ID						{Id($1)}
 |	expr EQ expr					{Eq($1, $3)}

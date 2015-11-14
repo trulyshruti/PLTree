@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdarg.h>
 #include "tree.h"
 
 
@@ -8,19 +9,22 @@ void print(struct tree *str) {
 	int width = str->width;
 	int i = 0;
 	while (i < width) {
- 		putchar(*(char *)(get_branch(str, i)->data)); 
+		struct tree *child = get_branch(str, i);
+		if (child->type == INT) {
+ 			putchar(child->data.i); 
+		}
 		i++; 
 	}
  }
 
 void init_tree(struct tree *root) {
-	root->data = NULL;
 	root->children = NULL;
 	root->sibling = NULL;
+	root->type = VOID;
 	root->width = 0;
 }
 
-struct tree *treemake(char *str) {
+struct tree *tree_of_string(char *str) {
 	struct tree *root = malloc(sizeof (struct tree));
 	int len = strlen(str);
 	int i;
@@ -29,11 +33,11 @@ struct tree *treemake(char *str) {
 	
 	for (i = 0; i <= len; i++) {
 		struct tree *child = malloc(sizeof(struct tree));
-		char *data = malloc(sizeof(char));
-		*data = str[i];
+		union data_u data;
+		data.c = str[i];
 		init_tree(child);
 		child->data = data;
-
+		child->type = CHAR;
 		add_child(root, child);
 	}
 
@@ -41,22 +45,63 @@ struct tree *treemake(char *str) {
 	return root;
 }
 
-/*
-struct tree *treemake(int i, struct tree *first, ...) {
-	struct tree *root = malloc(sizeof(struct tree));
-	init_tree(root);
+struct tree *int_treemake(int i_data, struct tree *child, ...) {
+	va_list args;
+	union data_u data;
+	struct tree *root;
 
-	*(int *)(root->data) = i;
+	va_start(args, child);
+	data.i = i_data;
+	root = treemake(INT, data, child, args);
+	va_end(args);
+
+
+	return root;
+}
 	
-	while (*children != NULL) {
-		struct tree *child = *children;
+
+struct tree *char_treemake(char c_data, struct tree *child, ...) {
+	va_list args;
+	union data_u data;
+	struct tree *root;
+
+	va_start(args, child);
+	data.c = c_data;
+	root = treemake(CHAR, data, child, args);
+	va_end(args);
+
+	return root;
+}
+
+	
+struct tree *double_treemake(int d_data, struct tree *child, ...) {
+	va_list args;
+	union data_u data;
+	struct tree *root;
+
+	va_start(args, child);
+	data.d = d_data;
+	root = treemake(DOUBLE, data, child, args);
+	va_end(args);
+
+	return root;
+}
+
+struct tree *treemake(data_type type, union data_u data, struct tree *child,  va_list args) {
+	struct tree *root = malloc(sizeof(struct tree));
+
+	init_tree(root);
+	root->type = type;
+	root->data = data;
+
+
+	while (child != NULL) {
 		add_child(root, child);
-		children++;
+		child = va_arg(args, struct tree *);
 	}
 
 	return root;
 }
-*/
 
 int add_sibling (struct tree *root, struct tree *sibling, int n) {
 	if (root == NULL)
@@ -79,7 +124,7 @@ int add_child (struct tree *root, struct tree *child) {
 		root->width = 1;
 		return 1;
 	} else {
-		int n = add_sibling(root->children, child, 1);
+		int n = add_sibling(root->children, child, 2);
 		root->width = n;
 		return n;
 	}
@@ -96,6 +141,10 @@ data_type get_type(struct tree *t) {
 struct tree *get_ith_sibling(struct tree *root, int i) {
 	if (i == 0) {
 		return root;
+	}
+
+	if (root == NULL) {
+		return NULL;
 	}
 
 	if (root->sibling == NULL) {

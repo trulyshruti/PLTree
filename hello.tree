@@ -1,3 +1,4 @@
-(char str "Hello, World!\n")
+(char str 0 ('H') ('e') ('l') ('l') ('o') (',')
+	(' ') ('W') ('o') ('r') ('l') ('d') ('!') ('\n'))
 
 (print str)

@@ -23,7 +23,7 @@ hello: hello.o tree.o
 
 hello.o: hello.c tree.h
 
-hello.c: calc
+hello.c: calc hello.tree
 	cat hello.tree | ./calc -c > hello.c
 
 

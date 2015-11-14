@@ -11,10 +11,12 @@ let rec gen_c_expr = function
 	Lit(x) -> x
 |	FunCall(x, y) -> ("" ^ x ^ "(" ^  (gen_c_expr y) ^ ")")
 |	Tree(x, y) -> let rec gen_c_tree_list = function
-				hd::tl -> "treemake(" ^ gen_c_expr hd ^ ", NULL), " ^ gen_c_tree_list tl
+				hd::tl -> "int_treemake(" ^ gen_c_expr hd ^ ",
+				NULL), " ^ gen_c_tree_list tl
 			|	[] -> "NULL"
 			in
-			"treemake(" ^ (gen_c_expr x) ^ ")"
+			"int_treemake(" ^ (gen_c_expr x) ^ ", " ^
+			gen_c_tree_list y ^ ")\n"
 |	Eq(v1, v2) -> ("(" ^ gen_c_expr v1 ^ ") == (" ^ gen_c_expr v2 ^ ")")
 |	Lt(v1, v2) -> ("(" ^ gen_c_expr v1 ^ ") < (" ^ gen_c_expr v2 ^ ")")
 |	Add(v1, v2) -> ("(" ^ gen_c_expr v1 ^ ") + (" ^ gen_c_expr v2 ^ ")")

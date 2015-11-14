@@ -29,6 +29,7 @@ rule token = parse
 | "void"   		{ VOID }
 | "double" 		{ DOUBLE }
 | "'"[^'\n']"'" as lxm	{ LITERAL(lxm) }
+| "'\\n'" 	as lxm  { LITERAL(lxm) }
 | '-'?['0'-'9']+ as lxm 	{ LITERAL(lxm) }
 | '-'?['0'-'9']+'.'['0'-'9']+ as lxm { LITERAL(lxm) }
 | '"'([^'\n''"']|"\\\"")*'"' as lxm { LITERAL(lxm) }
