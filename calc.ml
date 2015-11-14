@@ -7,60 +7,34 @@ let rec string_tab n v = if n == 0 then v else string_tab (n-1) ("\t" ^ v)
 
 
 
-let rec gen_c_expr = function 
+let rec gen_c_expr = 
+	let rec gen_c_tree_list = function
+		hd::tl -> gen_c_expr hd ^ ", \n" ^ gen_c_tree_list tl
+	|	[] -> ""
+	in
+	function 
 	FunCall(x, y) -> ("" ^ x ^ "(" ^  (gen_c_expr y) ^ ")")
-(*
-|	Tree(data, branch_list) -> 
-		let get_data_type = function
-			IntLit(x) -> "int_treemake(" ^ x ^ ", "
-		|	ChrLit(x) -> "char_treemake(" ^ x ^ ", "
-		|	FltLit(x) -> "double_treemake(" ^ x ^ ", "
-		|	hd -> "tree_treemake(" ^ gen_c_expr hd
-		in
-
-		let rec gen_c_tree_list = function 
-			hd::tl -> get_data_type hd ^ "NULL), \n" ^ gen_c_tree_list tl
-		|	[] -> "NULL"
-		in
-		get_data_type data ^ ", \n" ^ gen_c_tree_list branch_list ^ ")"
-*)
 |	Tree(IntLit(x), children) -> 
-		let rec gen_c_tree_list = function
-			hd::tl -> gen_c_expr hd ^ ", " ^ gen_c_tree_list tl
-		|	[] -> ""
-		in
 		"int_treemake(" ^ x ^ ", " ^ gen_c_tree_list children ^ "NULL)"
 |	Tree(ChrLit(x), children) -> 
-		let rec gen_c_tree_list = function
-			hd::tl -> gen_c_expr hd ^ ", " ^ gen_c_tree_list tl
-		|	[] -> ""
-		in
 		"char_treemake(" ^ x ^ ", " ^ gen_c_tree_list children ^ "NULL)"
 |	Tree(FltLit(x), children) -> 
-		let rec gen_c_tree_list = function
-			hd::tl -> gen_c_expr hd ^ ", " ^ gen_c_tree_list tl
-		|	[] -> ""
-		in
 		"double_treemake(" ^ x ^ ", " ^ gen_c_tree_list children ^ "NULL)"
 |	Tree(StrLit(x), children) -> "tree_of_string(" ^ x ^ ")"
 |	Tree(expr, children) -> 
-		let rec gen_c_tree_list = function
-			hd::tl -> gen_c_expr hd ^ ", " ^ gen_c_tree_list tl
-		|	[] -> ""
-		in
 		"tree_treemake(" ^ gen_c_expr expr ^ ", " ^ gen_c_tree_list children ^ "NULL)"
-|	Eq(v1, v2) -> ("(" ^ gen_c_expr v1 ^ ") == (" ^ gen_c_expr v2 ^ ")")
-|	Lt(v1, v2) -> ("(" ^ gen_c_expr v1 ^ ") < (" ^ gen_c_expr v2 ^ ")")
-|	Add(v1, v2) -> ("(" ^ gen_c_expr v1 ^ ") + (" ^ gen_c_expr v2 ^ ")")
+|	Eq(v1, v2) -> ("equal(" ^ gen_c_expr v1 ^ ", " ^ gen_c_expr v2 ^ ")")
+|	Lt(v1, v2) -> ("lt(" ^ gen_c_expr v1 ^ ", " ^ gen_c_expr v2 ^ ")")
+|	Add(v1, v2) -> ("add(" ^ gen_c_expr v1 ^ ", " ^ gen_c_expr v2 ^ ")")
 |	Id(v1) -> "" ^ v1
+|	IntLit(x) -> x
+|	ChrLit(x) -> x
+|	FltLit(x) -> x
+|	StrLit(x) -> x
 
 let rec gen_c = function n -> function
 	While(x, y) -> string_tab n ("while ("^(gen_c_expr x) ^ ") { \n" ^ (gen_c (n+1) y) ^ "\n" ^  string_tab n "}")
-|	VarDec(v1, v2, v3) -> (match v1 with
-				Int -> string_tab n ("struct tree * " ^ v2 ^ " = " ^ gen_c_expr v3 ^ ";")
-			|	Char -> string_tab n ("struct tree * " ^ v2 ^ " = " ^ gen_c_expr v3 ^ ";")
-			|	Double -> string_tab n ("struct tree * " ^ v2 ^ ", " ^ gen_c_expr v3 ^ ";")
-			|	Bool -> string_tab n ("struct tree * " ^ v2 ^ " = " ^ gen_c_expr v3 ^ ";"))
+|	VarDec(v2, v3) -> string_tab n ("struct tree * " ^ v2 ^ " = " ^ gen_c_expr v3 ^ ";")
 |	Assn(v1, v2) -> string_tab n ("" ^ v1 ^ " = " ^ gen_c_expr v2 ^ ";")
 |	Expr(v1) -> string_tab n (gen_c_expr v1)
 |	Seq(v1) -> let rec gen_c_seq = function
@@ -71,40 +45,37 @@ let rec gen_c = function n -> function
 
 
 
-(*
-
-let rec eval_expr = function 
-	Lit(x) -> "Lit(" ^ x ^ ")"
-|	Tree(x, y) -> let rec eval_tree_list = function
-				hd::tl -> "Tree(" ^ eval_expr hd ^ ", [])::" ^ eval_tree_list tl
-			|	[] -> "[]"
-			in
-			"Tree(" ^ (eval_expr x) ^ ", " ^ eval_tree_list y ^ ")"
-|	FunCall(x, y) -> ("FunCall(" ^ x ^ ", " ^  (eval_expr y) ^ ")")
+let rec eval_expr =
+	let rec eval_tree_list = function
+		hd::tl -> eval_expr hd ^ "::" ^ eval_tree_list tl
+	|	[] -> "[]"
+	in
+	function 
+	FunCall(x, y) -> ("" ^ x ^ "(" ^  (eval_expr y) ^ ")")
+|	Tree(expr, children) -> 
+		"Tree(" ^ eval_expr expr ^ ", " ^ eval_tree_list children ^ ")"
 |	Eq(v1, v2) -> ("Eq(" ^ eval_expr v1 ^ ", " ^ eval_expr v2 ^ ")")
 |	Lt(v1, v2) -> ("Lt(" ^ eval_expr v1 ^ ", " ^ eval_expr v2 ^ ")")
 |	Add(v1, v2) -> ("Add(" ^ eval_expr v1 ^ ", " ^ eval_expr v2 ^ ")")
-|	Id(v1) -> v1
+|	Id(v1) -> "Id(" ^ v1 ^ ")"
+|	IntLit(x) -> x
+|	ChrLit(x) -> x
+|	FltLit(x) -> x
+|	StrLit(x) -> x
 
 let rec eval = function n -> function
-	While(x, y) -> string_tab n ("While("^(eval_expr x) ^ ", \n" ^ (eval (n+1) y) ^ "\n" ^  string_tab n ")")
-|	VarDec(v1, v2, v3) -> (match v1 with
-				Int -> string_tab n ("VarDec(Int, " ^ v2 ^ ", " ^ eval_expr v3 ^ ")")
-			|	Char -> string_tab n ("VarDec(Char, " ^ v2 ^ ", " ^ eval_expr v3 ^ ")")
-			|	Double -> string_tab n ("VarDec(Double, " ^ v2 ^ ", " ^ eval_expr v3 ^ ")")
-			|	Bool -> string_tab n ("VarDec(Bool, " ^ v2 ^ ", " ^ eval_expr v3 ^ ")"))
+	While(x, y) -> string_tab n ("While("^(eval_expr x) ^ ",\n" ^ (eval (n+1) y) ^ "\n" ^  string_tab n ")")
+|	VarDec(v2, v3) -> string_tab n ("VarDec(" ^ v2 ^ ", " ^ eval_expr v3 ^ ")")
 |	Assn(v1, v2) -> string_tab n ("Assn(" ^ v1 ^ ", " ^ eval_expr v2 ^ ")")
 |	Expr(v1) -> string_tab n (eval_expr v1)
 |	Seq(v1) -> let rec eval_seq = function
 				hd::tl -> eval n hd ^ "\n" ^ eval_seq tl
 			|	[] -> "" in
 		eval_seq v1
-
 let rec eval_prog = function
 	hd::tl -> "" ^ eval 0 hd ^ "\n" ^ eval_prog tl
 |	[] -> ""
 
-*)
 let rec gen_c_prog = function
 	hd::tl -> "" ^ gen_c 1 hd ^ ";\n" ^ gen_c_prog tl
 |	[] -> ""
@@ -128,5 +99,5 @@ let get_c = function
 let _ = 
 	let lexbuf = Lexing.from_channel stdin in
 	let program = Parser.program Scanner.token lexbuf in
-	let result = if (Array.length Sys.argv > 1 && Sys.argv.(1) = "-c") then get_c program else "" in
+	let result = if (Array.length Sys.argv > 1 && Sys.argv.(1) = "-c") then get_c program else eval_prog program in
 	print_endline result;

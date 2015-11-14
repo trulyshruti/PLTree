@@ -1,4 +1,13 @@
-(char str 0 {'h'} {'e'} {'l'} {'l'} {'o'} {'\n'})
+(char str {'h' 'e' 'l' 'l' 'o' '\n'})
 
 (print "Hello, World!\n")
+
 (print str)
+
+
+(int a 0)
+
+(while (a < 10) 
+	(print "Hello, World!\n")
+	(= a (a + 1))
+)

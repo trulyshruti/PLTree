@@ -15,7 +15,100 @@ void print(struct tree *str) {
 		}
 		i++; 
 	}
- }
+}
+
+int equal(struct tree *lhs, struct tree *rhs) {
+	if (lhs->type != rhs->type)
+		return 0;
+	
+	switch(lhs->type) {
+		case CHAR:
+			return lhs->data.c == rhs->data.c;
+		case INT:
+			return lhs->data.i == rhs->data.i;
+		case DOUBLE:
+			return lhs->data.d == rhs->data.d;
+		default:
+			return 0;
+	}
+
+}
+int lt(struct tree *lhs, struct tree *rhs) {
+	if (lhs->type != rhs->type)
+		return 0;
+	
+	switch(lhs->type) {
+		case CHAR:
+			return lhs->data.c < rhs->data.c;
+		case INT:
+			return lhs->data.i < rhs->data.i;
+		case DOUBLE:
+			return lhs->data.d < rhs->data.d;
+		default:
+			return 0;
+	}
+
+}
+int gt(struct tree *lhs, struct tree *rhs) {
+	if (lhs->type != rhs->type)
+		return 0;
+	
+	switch(lhs->type) {
+		case CHAR:
+			return lhs->data.c > rhs->data.c;
+		case INT:
+			return lhs->data.i > rhs->data.i;
+		case DOUBLE:
+			return lhs->data.d > rhs->data.d;
+		default:
+			return 0;
+	}
+
+}
+int lte(struct tree *lhs, struct tree *rhs) {
+	return lt(lhs, rhs) || equal(lhs, rhs);
+}
+int gte(struct tree *lhs, struct tree *rhs) {
+	return gt(lhs, rhs) || equal(lhs, rhs);
+}
+
+
+struct tree *sub(struct tree *lhs, struct tree *rhs) {
+	if (lhs->type != rhs->type)
+		return NULL;
+
+	switch (lhs->type) {
+		case CHAR:
+			return char_treemake(lhs->data.c - rhs->data.c, NULL);
+			break;
+		case INT:
+			return int_treemake(lhs->data.i - rhs->data.i, NULL);
+			break;
+		case DOUBLE:
+			return double_treemake(lhs->data.d - rhs->data.d, NULL);
+			break;
+		default:	
+			return NULL;
+	}
+}
+struct tree *add(struct tree *lhs, struct tree *rhs) {
+	if (lhs->type != rhs->type)
+		return NULL;
+
+	switch (lhs->type) {
+		case CHAR:
+			return char_treemake(lhs->data.c + rhs->data.c, NULL);
+			break;
+		case INT:
+			return int_treemake(lhs->data.i + rhs->data.i, NULL);
+			break;
+		case DOUBLE:
+			return double_treemake(lhs->data.d + rhs->data.d, NULL);
+			break;
+		default:	
+			return NULL;
+	}
+}
 
 void init_tree(struct tree *root) {
 	root->children = NULL;

@@ -1,5 +1,5 @@
 type vtype =
-	Int | Char | Double | Bool
+	Int | Char | Double | Bool | String
 
 
 type expr =
@@ -16,7 +16,7 @@ type expr =
 
 type stmt = 
 	While of expr * stmt
-|	VarDec of vtype * string * expr
+|	VarDec of string * expr
 |	Assn of string * expr
 |	Expr of expr
 |	Seq of stmt list

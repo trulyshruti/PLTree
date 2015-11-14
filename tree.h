@@ -23,6 +23,17 @@ void print (struct tree *str);
 
 void init_tree (struct tree *root);
 
+int equal(struct tree *lhs, struct tree *rhs);
+int lt(struct tree *lhs, struct tree *rhs);
+int gt(struct tree *lhs, struct tree *rhs);
+int lte(struct tree *lhs, struct tree *rhs);
+int gte(struct tree *lhs, struct tree *rhs);
+
+struct tree *sub(struct tree *lhs, struct tree *rhs);
+struct tree *add(struct tree *lhs, struct tree *rhs);
+struct tree *mult(struct tree *lhs, struct tree *rhs);
+
+
 
 struct tree *int_treemake(int i_data, struct tree *child, ...);
 struct tree *char_treemake(char c_data, struct tree *child, ...);
