@@ -7,6 +7,7 @@ union data_u {
 	int i;
 	char c;
 	double d;
+	struct tree *t;
 };
 
 struct tree {
@@ -26,6 +27,7 @@ void init_tree (struct tree *root);
 struct tree *int_treemake(int i_data, struct tree *child, ...);
 struct tree *char_treemake(char c_data, struct tree *child, ...);
 struct tree *double_treemake(int d_data, struct tree *child, ...);
+struct tree *tree_treemake(struct tree *t_data, struct tree *child, ...);
 
 struct tree *treemake(data_type type, union data_u data, struct tree *child, va_list args);
 struct tree *tree_of_string (char *str);

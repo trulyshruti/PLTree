@@ -1,4 +1,4 @@
-(char str 0 ('H') ('e') ('l') ('l') ('o') (',')
-	(' ') ('W') ('o') ('r') ('l') ('d') ('!') ('\n'))
+(char str 0 {'h'} {'e'} {'l'} {'l'} {'o'} {'\n'})
 
+(print "Hello, World!\n")
 (print str)

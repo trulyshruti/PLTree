@@ -10,7 +10,7 @@ void print(struct tree *str) {
 	int i = 0;
 	while (i < width) {
 		struct tree *child = get_branch(str, i);
-		if (child->type == INT) {
+		if (child->type == CHAR) {
  			putchar(child->data.i); 
 		}
 		i++; 
@@ -86,6 +86,19 @@ struct tree *double_treemake(int d_data, struct tree *child, ...) {
 
 	return root;
 }
+
+struct tree *tree_treemake(struct tree *t_data, struct tree *child, ...) {
+	va_list args;
+	union data_u data;
+	struct tree *root;
+
+	va_start(args, child);
+	data.t = t_data;
+	root = treemake(TREE, data, child, args);
+	va_end(args);
+
+	return root;
+}	
 
 struct tree *treemake(data_type type, union data_u data, struct tree *child,  va_list args) {
 	struct tree *root = malloc(sizeof(struct tree));

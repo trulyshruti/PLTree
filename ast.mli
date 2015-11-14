@@ -1,9 +1,13 @@
 type vtype =
 	Int | Char | Double | Bool
 
+
 type expr =
 	Tree of expr * expr list
-|	Lit of string
+|	IntLit of string
+|	ChrLit of string
+|	FltLit of string
+|	StrLit of string
 |	FunCall of string * expr
 |	Eq of expr * expr
 |	Lt of expr * expr

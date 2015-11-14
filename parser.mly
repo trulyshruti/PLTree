@@ -5,7 +5,10 @@
 %token PLUS MINUS TIMES DIVIDE ASSIGN
 %token EQ NEQ LT LEQ GT GEQ
 %token RETURN IF IFELSE FOR WHILE INT CHAR BOOL DOUBLE VOID
-%token <string> LITERAL
+%token <string> INT_LITERAL
+%token <string> CHAR_LITERAL
+%token <string> FLOAT_LITERAL
+%token <string> STRING_LITERAL
 %token <string> ID
 %token EOF
 
@@ -47,12 +50,15 @@ stmt:
 
 expr_list:
 						{[]}
-|	LPAREN LITERAL RPAREN expr_list		{Lit($2) :: $4}
+|	LBRACE expr RBRACE expr_list		{$2 :: $4}
 
 expr:
 	LPAREN ID expr RPAREN				{FunCall($2, $3)}
-|	LITERAL expr_list 				{Tree(Lit($1), $2)}
-|	LITERAL						{Tree(Lit($1), [])}
+|	expr expr_list 					{Tree($1, $2)}
+|	INT_LITERAL					{Tree(IntLit($1), [])}
+|	CHAR_LITERAL					{Tree(ChrLit($1), [])}
+|	FLOAT_LITERAL					{Tree(FltLit($1), [])}
+|	STRING_LITERAL					{Tree(StrLit($1), [])}
 |	ID						{Id($1)}
 |	expr EQ expr					{Eq($1, $3)}
 |	expr LT expr					{Lt($1, $3)}
