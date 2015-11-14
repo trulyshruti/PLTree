@@ -20,7 +20,7 @@ let rec gen_c_expr =
 	in
 	function n ->
 	function 
-	FunCall(x, y) -> ("" ^ x ^ "(" ^  (gen_c_expr n y) ^ ")")
+	FunCall(x, y) -> ("" ^ x ^ "(\n" ^ string_tab (n+1) ((gen_c_expr (n+1) y) ^ ")"))
 |	Tree(IntLit(x), children) -> 
 		"int_treemake(" ^ x ^ ", " ^ gen_c_tree_list n children ^ "NULL)"
 |	Tree(ChrLit(x), children) -> 
@@ -58,10 +58,14 @@ let rec eval_expr = function n ->
 	|	[] -> "[]"
 	in
 	function 
-	FunCall(x, y) -> ("" ^ x ^ "(" ^  (eval_expr n y) ^ ")")
+	FunCall(x, y) -> ("FunCall(" ^ x ^ ", \n" ^ string_tab (n+1) ((eval_expr (n+1) y) ^ ")"))
 |	Tree(StrLit(x), []) -> "Tree(NULL, \n" ^ string_tab (n+1) (eval_tree_list n (tree_list_from_string x) ^ ")")
 |	Tree(expr, children) -> 
-		"Tree(" ^ eval_expr n expr ^ ", " ^ eval_tree_list (n+1) children ^ ")"
+		"Tree(" ^ eval_expr n expr ^  
+			if List.length children == 0 then
+				", [])"
+			else
+				", \n" ^ string_tab (n+1) (eval_tree_list (n+1) children ^ ")")
 |	Eq(v1, v2) -> ("Eq(" ^ eval_expr n v1 ^ ", " ^ eval_expr n v2 ^ ")")
 |	Lt(v1, v2) -> ("Lt(" ^ eval_expr n v1 ^ ", " ^ eval_expr n v2 ^ ")")
 |	Add(v1, v2) -> ("Add(" ^ eval_expr n v1 ^ ", " ^ eval_expr n v2 ^ ")")
