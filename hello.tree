@@ -4,10 +4,3 @@
 
 (print str)
 
-
-(int a 0)
-
-(while (a < 10) 
-	(print "Hello, World!\n")
-	(= a (a + 1))
-)

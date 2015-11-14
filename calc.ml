@@ -4,28 +4,35 @@ open Printf
 let rec string_tab n v = if n == 0 then v else string_tab (n-1) ("\t" ^ v)
 
 
-
+let rec tree_list_from_string = function s -> 
+					let len = String.length s in
+					if (len > 0) then 
+						Tree(ChrLit("'" ^ (Char.escaped (String.get s 0)) ^ "'") , [])::
+						tree_list_from_string (String.sub s 1 (len - 1))
+					else
+						[]
 
 
 let rec gen_c_expr = 
-	let rec gen_c_tree_list = function
-		hd::tl -> gen_c_expr hd ^ ", \n" ^ gen_c_tree_list tl
+	let rec gen_c_tree_list = function n -> function
+		hd::tl -> "" ^ (gen_c_expr n hd) ^ ", \n" ^ string_tab n (gen_c_tree_list n tl)
 	|	[] -> ""
 	in
+	function n ->
 	function 
-	FunCall(x, y) -> ("" ^ x ^ "(" ^  (gen_c_expr y) ^ ")")
+	FunCall(x, y) -> ("" ^ x ^ "(" ^  (gen_c_expr n y) ^ ")")
 |	Tree(IntLit(x), children) -> 
-		"int_treemake(" ^ x ^ ", " ^ gen_c_tree_list children ^ "NULL)"
+		"int_treemake(" ^ x ^ ", " ^ gen_c_tree_list n children ^ "NULL)"
 |	Tree(ChrLit(x), children) -> 
-		"char_treemake(" ^ x ^ ", " ^ gen_c_tree_list children ^ "NULL)"
+		"char_treemake(" ^ x ^ ", " ^ gen_c_tree_list n children ^ "NULL)"
 |	Tree(FltLit(x), children) -> 
-		"double_treemake(" ^ x ^ ", " ^ gen_c_tree_list children ^ "NULL)"
-|	Tree(StrLit(x), children) -> "tree_of_string(" ^ x ^ ")"
-|	Tree(expr, children) -> 
-		"tree_treemake(" ^ gen_c_expr expr ^ ", " ^ gen_c_tree_list children ^ "NULL)"
-|	Eq(v1, v2) -> ("equal(" ^ gen_c_expr v1 ^ ", " ^ gen_c_expr v2 ^ ")")
-|	Lt(v1, v2) -> ("lt(" ^ gen_c_expr v1 ^ ", " ^ gen_c_expr v2 ^ ")")
-|	Add(v1, v2) -> ("add(" ^ gen_c_expr v1 ^ ", " ^ gen_c_expr v2 ^ ")")
+		"double_treemake(" ^ x ^ ", " ^ gen_c_tree_list n children ^ "NULL)"
+|	Tree(StrLit(x), children) -> "tree_treemake(NULL, " ^ gen_c_tree_list n (tree_list_from_string x) ^ " NULL)"
+|	Tree(expr, children) ->
+		"tree_treemake(" ^ gen_c_expr n expr ^ ", " ^ gen_c_tree_list n children ^ "NULL)"
+|	Eq(v1, v2) -> ("equal(" ^ gen_c_expr n v1 ^ ", " ^ gen_c_expr n v2 ^ ")")
+|	Lt(v1, v2) -> ("lt(" ^ gen_c_expr n v1 ^ ", " ^ gen_c_expr n v2 ^ ")")
+|	Add(v1, v2) -> ("add(" ^ gen_c_expr n v1 ^ ", " ^ gen_c_expr n v2 ^ ")")
 |	Id(v1) -> "" ^ v1
 |	IntLit(x) -> x
 |	ChrLit(x) -> x
@@ -33,10 +40,10 @@ let rec gen_c_expr =
 |	StrLit(x) -> x
 
 let rec gen_c = function n -> function
-	While(x, y) -> string_tab n ("while ("^(gen_c_expr x) ^ ") { \n" ^ (gen_c (n+1) y) ^ "\n" ^  string_tab n "}")
-|	VarDec(v2, v3) -> string_tab n ("struct tree * " ^ v2 ^ " = " ^ gen_c_expr v3 ^ ";")
-|	Assn(v1, v2) -> string_tab n ("" ^ v1 ^ " = " ^ gen_c_expr v2 ^ ";")
-|	Expr(v1) -> string_tab n (gen_c_expr v1)
+	While(x, y) -> string_tab n ("while ("^(gen_c_expr n x) ^ ") { \n" ^ (gen_c (n+1) y) ^ "\n" ^  string_tab n "}")
+|	VarDec(v2, v3) -> string_tab n ("struct tree * " ^ v2 ^ " = " ^ gen_c_expr n v3 ^ ";")
+|	Assn(v1, v2) -> string_tab n ("" ^ v1 ^ " = " ^ gen_c_expr n v2 ^ ";")
+|	Expr(v1) -> string_tab n (gen_c_expr n v1)
 |	Seq(v1) -> let rec gen_c_seq = function
 				hd::tl -> gen_c n hd ^ ";\n" ^ gen_c_seq tl
 			|	[] -> "" in
@@ -45,18 +52,19 @@ let rec gen_c = function n -> function
 
 
 
-let rec eval_expr =
-	let rec eval_tree_list = function
-		hd::tl -> eval_expr hd ^ "::" ^ eval_tree_list tl
+let rec eval_expr = function n ->
+	let rec eval_tree_list = function n -> function
+		hd::tl -> eval_expr n hd ^ "::\n" ^ string_tab (n + 1) (eval_tree_list n tl)
 	|	[] -> "[]"
 	in
 	function 
-	FunCall(x, y) -> ("" ^ x ^ "(" ^  (eval_expr y) ^ ")")
+	FunCall(x, y) -> ("" ^ x ^ "(" ^  (eval_expr n y) ^ ")")
+|	Tree(StrLit(x), []) -> "Tree(NULL, \n" ^ string_tab (n+1) (eval_tree_list n (tree_list_from_string x) ^ ")")
 |	Tree(expr, children) -> 
-		"Tree(" ^ eval_expr expr ^ ", " ^ eval_tree_list children ^ ")"
-|	Eq(v1, v2) -> ("Eq(" ^ eval_expr v1 ^ ", " ^ eval_expr v2 ^ ")")
-|	Lt(v1, v2) -> ("Lt(" ^ eval_expr v1 ^ ", " ^ eval_expr v2 ^ ")")
-|	Add(v1, v2) -> ("Add(" ^ eval_expr v1 ^ ", " ^ eval_expr v2 ^ ")")
+		"Tree(" ^ eval_expr n expr ^ ", " ^ eval_tree_list (n+1) children ^ ")"
+|	Eq(v1, v2) -> ("Eq(" ^ eval_expr n v1 ^ ", " ^ eval_expr n v2 ^ ")")
+|	Lt(v1, v2) -> ("Lt(" ^ eval_expr n v1 ^ ", " ^ eval_expr n v2 ^ ")")
+|	Add(v1, v2) -> ("Add(" ^ eval_expr n v1 ^ ", " ^ eval_expr n v2 ^ ")")
 |	Id(v1) -> "Id(" ^ v1 ^ ")"
 |	IntLit(x) -> x
 |	ChrLit(x) -> x
@@ -64,10 +72,10 @@ let rec eval_expr =
 |	StrLit(x) -> x
 
 let rec eval = function n -> function
-	While(x, y) -> string_tab n ("While("^(eval_expr x) ^ ",\n" ^ (eval (n+1) y) ^ "\n" ^  string_tab n ")")
-|	VarDec(v2, v3) -> string_tab n ("VarDec(" ^ v2 ^ ", " ^ eval_expr v3 ^ ")")
-|	Assn(v1, v2) -> string_tab n ("Assn(" ^ v1 ^ ", " ^ eval_expr v2 ^ ")")
-|	Expr(v1) -> string_tab n (eval_expr v1)
+	While(x, y) -> string_tab n ("While("^(eval_expr n x) ^ ",\n" ^ (eval (n+1) y) ^ "\n" ^  string_tab n ")")
+|	VarDec(v2, v3) -> string_tab n ("VarDec(" ^ v2 ^ ", " ^ eval_expr n v3 ^ ")")
+|	Assn(v1, v2) -> string_tab n ("Assn(" ^ v1 ^ ", " ^ eval_expr n v2 ^ ")")
+|	Expr(v1) -> string_tab n (eval_expr n v1)
 |	Seq(v1) -> let rec eval_seq = function
 				hd::tl -> eval n hd ^ "\n" ^ eval_seq tl
 			|	[] -> "" in

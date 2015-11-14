@@ -117,6 +117,7 @@ void init_tree(struct tree *root) {
 	root->width = 0;
 }
 
+/*
 struct tree *tree_of_string(char *str) {
 	struct tree *root = malloc(sizeof (struct tree));
 	int len = strlen(str);
@@ -137,6 +138,7 @@ struct tree *tree_of_string(char *str) {
 
 	return root;
 }
+*/
 
 struct tree *int_treemake(int i_data, struct tree *child, ...) {
 	va_list args;
