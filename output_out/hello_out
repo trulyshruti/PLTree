@@ -1,0 +1,25 @@
+VarDec(str, Tree(0, Tree('h', [])::
+		Tree('e', [])::
+		Tree('l', [])::
+		Tree('l', [])::
+		Tree('o', [])::
+		Tree('\n', [])::
+		[]))
+print(Tree(NULL, 
+	Tree('H', [])::
+	Tree('e', [])::
+	Tree('l', [])::
+	Tree('l', [])::
+	Tree('o', [])::
+	Tree(',', [])::
+	Tree(' ', [])::
+	Tree('W', [])::
+	Tree('o', [])::
+	Tree('r', [])::
+	Tree('l', [])::
+	Tree('d', [])::
+	Tree('!', [])::
+	Tree('\n', [])::
+	[]))
+print(Id(str))
+
