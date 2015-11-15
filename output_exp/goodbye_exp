@@ -1,11 +1,5 @@
 VarDec(str, Tree(0, 
 	Tree('h', [])::
-	Tree('e', [])::
-	Tree('l', [])::
-	Tree('l', [])::
-	Tree('o', [])::
-	Tree('\n', [])::
-	[]))
 FunCall(print, 
 	Tree(NULL, 
 		Tree('H', [])::
