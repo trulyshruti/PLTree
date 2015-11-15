@@ -20,7 +20,7 @@ let rec gen_c_expr =
 	in
 	function n ->
 	function 
-	FunCall(x, y) -> ("" ^ x ^ "(" ^ ((gen_c_expr (n+1) y) ^ ")"))
+	FunCall(x, y) -> ("" ^ x ^ "(\n" ^ string_tab (n + 1) (gen_c_expr (n+1) y) ^ ")" )
 |	Tree(IntLit(x), children) -> 
 		"int_treemake(" ^ x ^ ", " ^ 
 			if List.length children == 0 then

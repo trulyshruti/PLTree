@@ -1,28 +1,12 @@
-VarDec(str, Tree(0, 
-	Tree('h', [])::
-	Tree('e', [])::
-	Tree('l', [])::
-	Tree('l', [])::
-	Tree('o', [])::
-	Tree('\n', [])::
-	[]))
-FunCall(print, 
-	Tree(NULL, 
-		Tree('H', [])::
-		Tree('e', [])::
-		Tree('l', [])::
-		Tree('l', [])::
-		Tree('o', [])::
-		Tree(',', [])::
-		Tree(' ', [])::
-		Tree('W', [])::
-		Tree('o', [])::
-		Tree('r', [])::
-		Tree('l', [])::
-		Tree('d', [])::
-		Tree('!', [])::
-		Tree('\n', [])::
-		[]))
-FunCall(print, 
-	Id(str))
+VarDec(a, Tree(0, []))
+While(Lt(Id(a), Tree(10, [])),
+	FunCall(print, 
+		Tree(NULL, 
+			Tree('H', [])::
+			Tree('i', [])::
+			Tree('!', [])::
+			Tree('\n', [])::
+			[]))
+	Assn(a, Add(Id(a), Tree(1, [])))
 
+)
