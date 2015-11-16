@@ -72,9 +72,9 @@ else
 					# check if there are diffs
 					if ! [[ $(diff ${outdict}${progname}${out} ${expdict}${progname}${exp}) ]]
 					then
-						printf "${arg}${progname}: \033[0;32mSUCCESS\033[0m\n"
+						printf "${arg}/${progname}: \033[0;32mSUCCESS\033[0m\n"
 					else
-						printf "${arg}${progname}: \033[0;31mFAILED\033[0m\n"
+						printf "${arg}/${progname}: \033[0;31mFAILED\033[0m\n"
 					fi
 				fi
 			done
