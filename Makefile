@@ -2,15 +2,10 @@ CC = gcc
 
 TARFILES = Makefile scanner.mll parser.mly ast.mli calc.ml
 
-OBJS = ast.cmo parser.cmo scanner.cmo calc.cmo
-ALLOBJS = ast.cmo parser.cmo scanner.cmo compile.cmo execute.cmo pltree.cmo
-
+OBJS = parser.cmo scanner.cmo calc.cmo
 
 calc : $(OBJS)
 	ocamlc -o calc $(OBJS)
-
-pltree: $(ALLOBJS)
-	ocamlc -o pltree $(ALLOBJS)
 
 scanner.ml : scanner.mll
 	ocamllex scanner.mll
@@ -41,7 +36,7 @@ calculator.tar.gz : $(TARFILES)
 
 .PHONY : clean
 clean :
-	rm -f calc pltree parser.ml parser.mli scanner.ml
+	rm -f calc parser.ml parser.mli scanner.ml 
 	rm -f *.cmo *.cmi hello hello.c tree tree.o hello.o
 	rm -f *.automaton *.conflicts
 
@@ -56,10 +51,3 @@ scanner.cmo : parser.cmi
 scanner.cmx : parser.cmx
 ast.cmi :
 parser.cmi : ast.cmi
-calc.cmo: scanner.cmo parser.cmi ast.cmi
-calc.cmx: scanner.cmx parser.cmx ast.cmi
-parser.cmo: ast.cmi parser.cmi
-parser.cmx: ast.cmi parser.cmi
-scanner.cmo: parser.cmi
-scanner.cmx: parser.cmx
-parser.cmi: ast.cmi
