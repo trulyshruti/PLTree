@@ -4,13 +4,14 @@ open Printf
 let rec string_tab n v = if n == 0 then v else string_tab (n-1) ("\t" ^ v)
 
 
-let rec tree_list_from_string = function s -> 
-					let len = String.length s in
-					if (len > 0) then 
-						Tree(ChrLit("'" ^ (Char.escaped (String.get s 0)) ^ "'") , [])::
-						tree_list_from_string (String.sub s 1 (len - 1))
-					else
-						[]
+let rec tree_list_from_string = 
+	function s -> 
+		let len = String.length s in
+		if (len > 0) then 
+			Tree(ChrLit("'" ^ (Char.escaped (String.get s 0)) ^ "'") , [])::
+			tree_list_from_string (String.sub s 1 (len - 1))
+		else
+			[]
 
 
 let rec gen_c_expr = 

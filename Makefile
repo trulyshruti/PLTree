@@ -19,6 +19,10 @@ parser.ml parser.mli : parser.mly
 %.cmi : %.mli
 	ocamlc -c $<
 
+.PHONY : menhir
+menhir:
+	menhir -v parser.mly
+
 hello: hello.o tree.o
 
 hello.o: hello.c tree.h
