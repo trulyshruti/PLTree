@@ -60,7 +60,7 @@ expr_list:
 
 expr:
 	LPAREN ID expr RPAREN				{FunCall($2, $3)}
-|	LBRACE expr_list RBRACE				{Tree(IntLit("0"), $2)}
+|	LBRACE expr_list RBRACE				{Tree(Void, $2)}
 |	COL expr LBRACE expr_list RBRACE		{Tree($2, $4)}
 |	INT_LITERAL					{Tree(IntLit($1), [])}
 |	CHAR_LITERAL					{Tree(ChrLit($1), [])}

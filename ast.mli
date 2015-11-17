@@ -8,6 +8,7 @@ type expr =
 |	ChrLit of string
 |	FltLit of string
 |	StrLit of string
+|	Void
 |	FunCall of string * expr
 |	Eq of expr * expr
 |	Lt of expr * expr

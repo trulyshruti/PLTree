@@ -1,4 +1,4 @@
-VarDec(str, Tree(0, 
+VarDec(str, Tree(Void, 
 	Tree('h', [])::
 	Tree('e', [])::
 	Tree('l', [])::
@@ -7,7 +7,7 @@ VarDec(str, Tree(0,
 	Tree('\n', [])::
 	[]))
 FunCall(print, 
-	Tree(NULL, 
+	Tree(Void, 
 		Tree('H', [])::
 		Tree('e', [])::
 		Tree('l', [])::

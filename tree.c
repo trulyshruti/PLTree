@@ -10,8 +10,16 @@ void print(struct tree *str) {
 	int i = 0;
 	while (i < width) {
 		struct tree *child = get_branch(str, i);
-		if (child->type == CHAR) {
- 			putchar(child->data.i); 
+		if (child) {
+			if (child->type == CHAR) {
+				putchar(child->data.c); 
+			} else if (child->type == INT) {
+				printf("%d", child->data.i);
+			} else if (child->type == DOUBLE) {
+				printf("%f", child->data.d);
+			} else if (child->type == TREE) {
+				print(child->data.t);
+			}
 		}
 		i++; 
 	}

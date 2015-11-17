@@ -13,6 +13,7 @@
 (int a 0)
 
 (while (a < 10)
-	(print "Hi!\n")
+	(print {a})
+	(print ": Hi!\n")
 	(= a (a+1))
 )

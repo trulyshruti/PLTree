@@ -40,6 +40,12 @@ let rec gen_c_expr =
 				"NULL)"
 			else
 				"\n" ^ string_tab (n+1) (gen_c_tree_list (n+1) children ^ "NULL)")
+|	Tree(Void, children) ->
+		"void_treemake(" ^
+			if List.length children == 0 then
+				"NULL)"
+			else
+				"\n" ^ string_tab (n+1) (gen_c_tree_list (n+1) children ^ "NULL)")
 |	Tree(StrLit(x), []) -> "void_treemake(\n" ^ 
 			string_tab (n+1) (gen_c_tree_list (n+1) (tree_list_from_string x) ^ "NULL)")
 |	Tree(expr, children) ->
@@ -56,6 +62,7 @@ let rec gen_c_expr =
 |	ChrLit(x) -> x
 |	FltLit(x) -> x
 |	StrLit(x) -> x
+|	Void -> ""
 
 let rec gen_c = function n -> function
 	While(x, y) -> string_tab n ("while ("^(gen_c_expr n x) ^ ") { \n" ^ (gen_c (n+1) y) ^ "\n" ^  string_tab n "}")
@@ -77,7 +84,7 @@ let rec eval_expr = function n ->
 	in
 	function 
 	FunCall(x, y) -> ("FunCall(" ^ x ^ ", \n" ^ string_tab (n+1) ((eval_expr (n+1) y) ^ ")"))
-|	Tree(StrLit(x), []) -> "Tree(NULL, \n" ^ string_tab (n+1) (eval_tree_list (n+1) (tree_list_from_string x) ^ ")")
+|	Tree(StrLit(x), []) -> "Tree(Void, \n" ^ string_tab (n+1) (eval_tree_list (n+1) (tree_list_from_string x) ^ ")")
 |	Tree(expr, children) -> 
 		"Tree(" ^ eval_expr n expr ^  
 			if List.length children == 0 then
@@ -92,6 +99,7 @@ let rec eval_expr = function n ->
 |	ChrLit(x) -> x
 |	FltLit(x) -> x
 |	StrLit(x) -> x
+|	Void -> "Void"
 
 let rec eval = function n -> function
 	While(x, y) -> string_tab n ("While("^(eval_expr n x) ^ ",\n" ^ (eval (n+1) y) ^ "\n" ^  string_tab n ")")
