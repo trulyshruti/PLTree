@@ -117,29 +117,6 @@ void init_tree(struct tree *root) {
 	root->width = 0;
 }
 
-/*
-struct tree *tree_of_string(char *str) {
-	struct tree *root = malloc(sizeof (struct tree));
-	int len = strlen(str);
-	int i;
-
-	init_tree(root);
-	
-	for (i = 0; i <= len; i++) {
-		struct tree *child = malloc(sizeof(struct tree));
-		union data_u data;
-		data.c = str[i];
-		init_tree(child);
-		child->data = data;
-		child->type = CHAR;
-		add_child(root, child);
-	}
-
-
-	return root;
-}
-*/
-
 struct tree *int_treemake(int i_data, struct tree *child, ...) {
 	va_list args;
 	union data_u data;
@@ -194,6 +171,21 @@ struct tree *tree_treemake(struct tree *t_data, struct tree *child, ...) {
 
 	return root;
 }	
+
+struct tree *void_treemake(struct tree *child, ...) {
+
+	va_list args;
+	struct tree *root;
+	union data_u data;
+
+	data.t = NULL;
+
+	va_start(args, child);
+	root = treemake(VOID, data, child, args);
+	va_end(args);
+
+	return root;
+}
 
 struct tree *treemake(data_type type, union data_u data, struct tree *child,  va_list args) {
 	struct tree *root = malloc(sizeof(struct tree));

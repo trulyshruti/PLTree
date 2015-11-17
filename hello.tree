@@ -1,4 +1,4 @@
-(char str {'h' 'e' 'l' 'l' 'o' '\n'})
+(char str : 'a' {'h' 'e' 'l' 'l' 'o' '\n'})
 
 (char h 'h')
 (char i 'i')

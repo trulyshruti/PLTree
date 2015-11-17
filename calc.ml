@@ -40,7 +40,7 @@ let rec gen_c_expr =
 				"NULL)"
 			else
 				"\n" ^ string_tab (n+1) (gen_c_tree_list (n+1) children ^ "NULL)")
-|	Tree(StrLit(x), []) -> "tree_treemake(NULL, \n" ^ 
+|	Tree(StrLit(x), []) -> "void_treemake(\n" ^ 
 			string_tab (n+1) (gen_c_tree_list (n+1) (tree_list_from_string x) ^ "NULL)")
 |	Tree(expr, children) ->
 		"tree_treemake(" ^ gen_c_expr n expr ^ ", " ^ 
