@@ -68,4 +68,6 @@ let translate prog =
 	let transformed = List.fold_left
 		(fun env stmt -> let (e,_) = transform_stmt env stmt in e) empty_env prog in
 
-	print_map transformed
+	print_map transformed;
+
+	List.map (fun stmt -> let (_,s) = transform_stmt empty_env stmt in s) prog
