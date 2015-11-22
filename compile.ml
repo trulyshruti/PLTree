@@ -43,24 +43,24 @@ let translate prog =
 	| Id(s) -> Sast.Id(s), Sast.Int in
 
 	let rec transform_stmt env = function
-		While(e,s) -> let globals = env.globals in
-		{env with globals=globals}, let (e,t) = expr env e in
+		(* TODO: include current globals in outer globals *)
+		While(e,s) -> env, let locs = env.locals in
+		let (e,t) = expr {env with globals=locs} e in
+		if t = Sast.Bool then
 		let (_,s) = transform_stmt env s in Sast.While(e,s)
-
+		else raise(Failure("While predicates must be of type bool"))
 	| VarDec(s,e) -> if StringMap.mem s env.locals then
 	raise (Failure (s ^ " is already declared")) else let (r,t) = expr env e in
-	let locals = StringMap.add s (r,t) env.locals in {env with locals=locals},
+	let locs = StringMap.add s (r,t) env.locals in {env with locals=locs},
 	Sast.VarDec(s,r)
-
 	| Assn(s,e) -> if StringMap.mem s env.locals then
 	let (eSast,tSast) = StringMap.find s env.locals in
 	let (r,t) = expr env e in if tSast = t then
-	let locals = StringMap.add s (r,t) env.locals in {env with locals=locals},
+	let locs = StringMap.add s (r,t) env.locals in {env with locals=locs},
 	Sast.Assn(s, r) else raise(Failure(s ^ " is defined as " ^
 	Sast.string_of_vtype tSast ^ ", not " ^ Sast.string_of_vtype t))
 	else raise (Failure(s ^ " has not been declared"))
-
-	| Expr(e) -> ignore(expr env e); env, let (e,_) = expr env e in Sast.Expr(e)
+	| Expr(e) -> env, let (e,_) = expr env e in Sast.Expr(e)
 	| Seq(l) -> env, let l = List.map
 	(fun stmt -> let (_,s) = transform_stmt env stmt in s) l in
 	Sast.Seq(l) in
