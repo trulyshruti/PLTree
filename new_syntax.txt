@@ -1,0 +1,42 @@
+variable declaration:
+	type id data [tree];
+	void id [tree];
+
+variable reassignment:
+	id <- expr
+
+
+function call:
+	id : expr
+
+
+arithmetic:
+	a + b
+	a - b
+	a * b
+	a / b
+
+comparison:
+	a = b
+	a < b
+	a > b
+	a <= b
+	a >= b
+
+function declaration:
+	id : [variables] statements;
+
+
+while:
+	while : [expr] statements;
+
+if:
+	if : [expr] statements;
+
+ifelse:
+	ifelse : [expr] statements; statements;
+
+tree dereference:
+	id.num
+
+parens establish precendence
