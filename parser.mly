@@ -12,11 +12,9 @@
 %token <string> ID
 %token EOF
 
-%right RBRACE
-%left LBRACE
+%left RPAREN
+%right LPAREN
 
-%right RPAREN
-%left LPAREN
 
 %nonassoc NOELSE
 %nonassoc ELSE
@@ -48,11 +46,11 @@ stmt_list:
 |	stmt stmt_list 	{$1 :: $2}
 
 stmt:
-	WHILE COL LBRACK expr RBRACK stmt_list SEMI {While($4, Seq($6))}
-|	vtype ID expr SEMI 			{VarDec($2, $3)}
-|	ID ASSIGN expr SEMI			{Assn($1, $3)}
-|	expr SEMI				{Expr($1)}
-|	LPAREN stmt RPAREN			{$2}
+	WHILE LBRACK expr RBRACK stmt_list SEMI 	{While($3, Seq($5))}
+|	vtype ID expr SEMI 				{VarDec($2, $3)}
+|	ID ASSIGN expr SEMI				{Assn($1, $3)}
+|	expr SEMI					{Expr($1)}
+|	LPAREN stmt RPAREN				{$2}
 
 expr_list:
 				{[]}
@@ -61,7 +59,7 @@ expr_list:
 expr:
 	ID COL expr					{FunCall($1, $3)}
 |	LBRACK expr_list RBRACK				{Tree(Void, $2)}
-|	COL expr LBRACK expr_list RBRACK		{Tree($2, $4)}
+|	LBRACE expr RBRACE LBRACK expr_list RBRACK		{Tree($2, $5)}
 |	INT_LITERAL					{Tree(IntLit($1), [])}
 |	CHAR_LITERAL					{Tree(ChrLit($1), [])}
 |	FLOAT_LITERAL					{Tree(FltLit($1), [])}

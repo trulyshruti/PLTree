@@ -1,18 +1,21 @@
-(char str {'h' 'e' 'l' 'l' 'o' '\n'})
+char h 'h';
+char i 'i';
+char nl '\n';
 
-(char h 'h')
-(char i 'i')
-(char nl '\n')
+print : [h i nl];
+char str {'a'} ['h' 'e' 'l' 'l' 'o' '\n'];
 
-(print {h i nl})
+print : "Hello, World!\n";
 
-(print "Hello, World!\n")
+print : str;
 
-(print str)
 
-(int a 0)
+int a 0;
 
-(while (a < 10)
-	(print "Hi!\n")
-	(= a (a+1))
-)
+
+while [a < 10]
+	print : [a ' ' (a+1)];
+	print : ": Hi!\n";
+	a = a + 1;
+;
+
