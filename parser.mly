@@ -12,6 +12,10 @@
 %token <string> ID
 %token EOF
 
+%left SEMI
+
+%right COL
+
 %left RPAREN
 %right LPAREN
 
