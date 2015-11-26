@@ -7,6 +7,8 @@ rule token = parse
 | ')'     		{ RPAREN }
 | '{'     		{ LBRACE }
 | '}'     		{ RBRACE }
+| '['			{ LBRACK }
+| ']'			{ RBRACK }
 | ','      		{ COMMA }
 | '+'      		{ PLUS }
 | '-'      		{ MINUS }
@@ -20,6 +22,7 @@ rule token = parse
 | ">"     		{ GT }
 | ">="    		{ GEQ }
 | ":"			{ COL }
+| ";"			{ SEMI }
 | "if"     		{ IF }
 | "ifelse" 		{ IFELSE }
 | "while"  		{ WHILE }

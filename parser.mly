@@ -1,7 +1,7 @@
 %{ open Ast %}
 
 
-%token SEMI LPAREN RPAREN LBRACE RBRACE COMMA COL
+%token SEMI LPAREN RPAREN LBRACE RBRACE LBRACK RBRACK COMMA COL
 %token PLUS MINUS TIMES DIVIDE ASSIGN
 %token EQ NEQ LT LEQ GT GEQ
 %token RETURN IF IFELSE FOR WHILE INT CHAR BOOL DOUBLE STRING VOID
@@ -44,24 +44,24 @@ vtype:
 
 
 stmt_list:
-			{[]}
+				{[]}
 |	stmt stmt_list 	{$1 :: $2}
 
 stmt:
-	LPAREN WHILE LPAREN expr RPAREN stmt_list RPAREN 	{While($4, Seq($6))}
-|	LPAREN vtype ID expr RPAREN				{VarDec($3, $4)}
-|	LPAREN ASSIGN ID expr RPAREN				{Assn($3, $4)}
-|	expr							{Expr($1)}
-|	LPAREN stmt RPAREN					{$2}
+	WHILE COL LBRACK expr RBRACK stmt_list SEMI {While($4, Seq($6))}
+|	vtype ID expr SEMI 			{VarDec($2, $3)}
+|	ID ASSIGN expr SEMI			{Assn($1, $3)}
+|	expr SEMI				{Expr($1)}
+|	LPAREN stmt RPAREN			{$2}
 
 expr_list:
 				{[]}
 |	expr expr_list		{$1 :: $2}
 
 expr:
-	LPAREN ID expr RPAREN				{FunCall($2, $3)}
-|	LBRACE expr_list RBRACE				{Tree(Void, $2)}
-|	COL expr LBRACE expr_list RBRACE		{Tree($2, $4)}
+	ID COL expr					{FunCall($1, $3)}
+|	LBRACK expr_list RBRACK				{Tree(Void, $2)}
+|	COL expr LBRACK expr_list RBRACK		{Tree($2, $4)}
 |	INT_LITERAL					{Tree(IntLit($1), [])}
 |	CHAR_LITERAL					{Tree(ChrLit($1), [])}
 |	FLOAT_LITERAL					{Tree(FltLit($1), [])}
@@ -69,4 +69,5 @@ expr:
 |	ID						{Id($1)}
 |	expr EQ expr					{Eq($1, $3)}
 |	expr LT expr					{Lt($1, $3)}
-|	LPAREN expr PLUS expr RPAREN			{Add($2, $4)}
+|	expr PLUS expr					{Add($1, $3)}
+|	LPAREN expr RPAREN				{$2}
