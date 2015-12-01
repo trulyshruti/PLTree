@@ -42,8 +42,8 @@ let translate prog =
 	if t1 = t2 then Sast.Add(e1,e2), Sast.Int else raise (Failure("Different types"))
 	| Id(s) -> Sast.Id(s), Sast.Int in
 
+	(* TODO: include current globals in outer globals *)
 	let rec transform_stmt env = function
-		(* TODO: include current globals in outer globals *)
 		While(e,s) -> env, let locs = env.locals in
 		let (e,t) = expr {env with globals=locs} e in
 		if t = Sast.Bool then
@@ -65,9 +65,11 @@ let translate prog =
 	(fun stmt -> let (_,s) = transform_stmt env stmt in s) l in
 	Sast.Seq(l) in
 
-	let transformed = List.fold_left
-		(fun env stmt -> let (e,_) = transform_stmt env stmt in e) empty_env prog in
+	let mapped = [] in
+	let (m, transformed) = List.fold_left
+		(fun (m, env) stmt -> let (e,s) = transform_stmt env stmt in
+		let mapped = s::mapped in mapped, e) (mapped, empty_env) prog in
 
 	print_map transformed;
 
-	List.map (fun stmt -> let (_,s) = transform_stmt empty_env stmt in s) prog
+	m
