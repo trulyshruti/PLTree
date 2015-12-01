@@ -31,17 +31,17 @@ let string_of_vtype = function
 | String -> "string"
 
 let rec string_of_expr = function
-	Tree(e,l) -> string_of_expr e ^ " {{ " ^
-		String.concat ", " (List.map string_of_expr l) ^ "}}"
+	Tree(e,l) -> string_of_expr e ^ if List.length l > 0 then" {{ " ^
+		String.concat ", " (List.map string_of_expr l) ^ "}}" else "{{}}"
 | IntLit(s) -> s
 | ChrLit(s) -> s
 | FltLit(s) -> s
 | StrLit(s) -> s
 | Void -> "void"
 | FunCall(s,e) -> s ^ "(" ^ string_of_expr e ^ ")"
-| Eq(e1, e2) -> string_of_expr e1 ^ " " ^ string_of_expr e2
-| Lt(e1, e2) -> string_of_expr e1 ^ " " ^ string_of_expr e2
-| Add(e1, e2) -> string_of_expr e1 ^ " " ^ string_of_expr e2
+| Eq(e1, e2) -> string_of_expr e1 ^ " == " ^ string_of_expr e2
+| Lt(e1, e2) -> string_of_expr e1 ^ " < " ^ string_of_expr e2
+| Add(e1, e2) -> string_of_expr e1 ^ " + " ^ string_of_expr e2
 | Id(s) -> s
 
 let rec string_of_stmt = function
