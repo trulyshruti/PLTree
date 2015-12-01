@@ -72,4 +72,4 @@ let translate prog =
 
 	print_map transformed;
 
-	m
+	List.rev m

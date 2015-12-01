@@ -2,8 +2,9 @@ open Sast
 
 let get_vars prog =
   let rec get_vars_list = function
-    hd::tl -> if hd = hd then hd::get_vars_list tl else []
-    | _ -> [] in
+    [] -> []
+    | hd::tl -> match hd with VarDec(_,_) -> hd::get_vars_list tl
+              | _ -> get_vars_list tl in
   get_vars_list prog
 let print_vars vars = string_of_program vars
 
