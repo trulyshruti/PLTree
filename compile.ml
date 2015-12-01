@@ -35,9 +35,9 @@ let translate prog =
 	|	Void -> Sast.Void, Sast.Int
 	| FunCall(s,e) -> let (e,t) = expr env e in Sast.FunCall(s,e), t
 	| Eq(e1, e2) -> let (e1,t1) = expr env e1 in let (e2,t2) = expr env e2 in
-	if t1 = t2 then Sast.Eq(e1,e2), Sast.Int else raise (Failure("Different types"))
+	if t1 = t2 then Sast.Eq(e1,e2), Sast.Bool else raise (Failure("Different types"))
 	| Lt(e1, e2) -> let (e1,t1) = expr env e1 in let (e2,t2) = expr env e2 in
-	if t1 = t2 then Sast.Lt(e1,e2), Sast.Int else raise (Failure("Different types"))
+	if t1 = t2 then Sast.Lt(e1,e2), Sast.Bool else raise (Failure("Different types"))
 	| Add(e1, e2) -> let (e1,t1) = expr env e1 in let (e2,t2) = expr env e2 in
 	if t1 = t2 then Sast.Add(e1,e2), Sast.Int else raise (Failure("Different types"))
 	| Id(s) -> Sast.Id(s), Sast.Int in
