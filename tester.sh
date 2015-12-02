@@ -46,7 +46,7 @@ else
 				cat $arg | ./calc > "${outdict}${progname}${out}"
 
 				# check if there are diffs
-				if ! [[ $(diff ${outdict}${progname}${out} ${expdict}${progname}${exp}) ]]
+				if ! [[ $(diff -bw ${outdict}${progname}${out} ${expdict}${progname}${exp}) ]]
 				then
 					printf "${progname}: \033[0;32mSUCCESS\033[0m\n"
 				else
@@ -70,7 +70,7 @@ else
 					cat $arg/$f | ./calc > "${outdict}${progname}${out}"
 
 					# check if there are diffs
-					if ! [[ $(diff ${outdict}${progname}${out} ${expdict}${progname}${exp}) ]]
+					if ! [[ $(diff -bw ${outdict}${progname}${out} ${expdict}${progname}${exp}) ]]
 					then
 						printf "${arg}/${progname}: \033[0;32mSUCCESS\033[0m\n"
 					else
