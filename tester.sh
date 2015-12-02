@@ -5,8 +5,8 @@
 # usage: ./tester.sh FILE.tree
 # To run, make sure that:
 # - FILE.tree is in same directory
-# - output_out/ directory exists in same directory
-# - output_exp/FILE_exp file exists (expected output file)
+# - tests/output_out/ directory exists in same directory
+# - tests/output_exp/FILE_exp file exists (expected output file)
 # - calc exists in same directory
 #
 
@@ -15,8 +15,20 @@ out='_out'
 exp='_exp'
 
 # define directories
-outdict='output_out/'
-expdict='output_exp/'
+outdict='tests/output_out/'
+expdict='tests/output_exp/'
+
+# First, check for -c (compile) flag
+while getopts ":c" opt; do
+	case $opt in
+		c)
+
+			;;
+		\?)
+			echo "Invalid option: -$OPTARG"
+			;;
+	esac
+done
 
 # Make sure there's arguments
 if [ $# -eq 0 ]
@@ -24,11 +36,13 @@ then
 	echo 'usage: ./tester.sh [FILE.tree | treedir/]?'
 	exit 2;
 # Make sure calc is in directory
-elif ! [ -a calc ]
-then
-	echo 'Invoke lexer/parser to produce calc file.'
-	exit 2;
 else
+	make &> /dev/null
+	if ! [ -a calc ]
+	then
+		echo 'Invoke lexer/parser to produce calc file.'
+		exit 2;
+	fi
 	for arg
 	do
 		# if it's a regular file
@@ -39,7 +53,7 @@ else
 			# Make sure an expected output file is present
 			if ! [ -a ${expdict}${progname}${exp} ]
 			then
-				echo "Place ${progname}_exp file in output_exp/ directory."
+				echo "Place ${progname}_exp file in tests/output_exp/ directory."
 				exit 2;
 			else
 				# run parser on input file; save output
@@ -63,7 +77,7 @@ else
 				# Make sure an expected output file is present
 				if ! [ -a ${expdict}${progname}${exp} ]
 				then
-					echo "Place ${progname}_exp file in output_exp/ directory."
+					echo "Place ${progname}_exp file in tests/output_exp/ directory."
 					exit 2;
 				else
 					# run parser on input file; save output
