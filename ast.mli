@@ -12,6 +12,7 @@ type expr =
 |	FunCall of string * expr
 |	Eq of expr * expr
 |	Lt of expr * expr
+| Gt of expr * expr
 |	Add of expr * expr
 | Minus of expr * expr
 | Mul of expr * expr
