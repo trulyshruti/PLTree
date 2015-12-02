@@ -55,8 +55,11 @@ let rec gen_c_expr =
 			else
 				"\n" ^ string_tab (n+1) (gen_c_tree_list (n+1) children ^ "NULL)")
 |	Eq(v1, v2) -> ("equal(" ^ gen_c_expr n v1 ^ ", " ^ gen_c_expr n v2 ^ ")")
+|	Neq(v1, v2) -> ("not-equal(" ^ gen_c_expr n v1 ^ ", " ^ gen_c_expr n v2 ^ ")")
 |	Lt(v1, v2) -> ("lt(" ^ gen_c_expr n v1 ^ ", " ^ gen_c_expr n v2 ^ ")")
+|	Leq(v1, v2) -> ("leq(" ^ gen_c_expr n v1 ^ ", " ^ gen_c_expr n v2 ^ ")")
 |	Gt(v1, v2) -> ("gt(" ^ gen_c_expr n v1 ^ ", " ^ gen_c_expr n v2 ^ ")")
+|	Geq(v1, v2) -> ("geq(" ^ gen_c_expr n v1 ^ ", " ^ gen_c_expr n v2 ^ ")")
 |	Add(v1, v2) -> ("add(" ^ gen_c_expr n v1 ^ ", " ^ gen_c_expr n v2 ^ ")")
 |	Minus(v1, v2) -> ("minus(" ^ gen_c_expr n v1 ^ ", " ^ gen_c_expr n v2 ^ ")")
 |	Mul(v1, v2) -> ("multiply(" ^ gen_c_expr n v1 ^ ", " ^ gen_c_expr n v2 ^ ")")
@@ -96,8 +99,11 @@ let rec eval_expr = function n ->
 			else
 				", \n" ^ string_tab (n+1) (eval_tree_list (n+1) children ^ ")")
 |	Eq(v1, v2) -> ("Eq(" ^ eval_expr n v1 ^ ", " ^ eval_expr n v2 ^ ")")
+|	Neq(v1, v2) -> ("Neq(" ^ eval_expr n v1 ^ ", " ^ eval_expr n v2 ^ ")")
 |	Lt(v1, v2) -> ("Lt(" ^ eval_expr n v1 ^ ", " ^ eval_expr n v2 ^ ")")
+|	Leq(v1, v2) -> ("Leq(" ^ eval_expr n v1 ^ ", " ^ eval_expr n v2 ^ ")")
 |	Gt(v1, v2) -> ("Gt(" ^ eval_expr n v1 ^ ", " ^ eval_expr n v2 ^ ")")
+|	Geq(v1, v2) -> ("Geq(" ^ eval_expr n v1 ^ ", " ^ eval_expr n v2 ^ ")")
 |	Add(v1, v2) -> ("Add(" ^ eval_expr n v1 ^ ", " ^ eval_expr n v2 ^ ")")
 |	Minus(v1, v2) -> ("Minus(" ^ eval_expr n v1 ^ ", " ^ eval_expr n v2 ^ ")")
 |	Mul(v1, v2) -> ("Mul(" ^ eval_expr n v1 ^ ", " ^ eval_expr n v2 ^ ")")

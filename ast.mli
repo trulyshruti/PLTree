@@ -11,8 +11,11 @@ type expr =
 |	Void
 |	FunCall of string * expr
 |	Eq of expr * expr
+| Neq of expr * expr
 |	Lt of expr * expr
+| Leq of expr * expr
 | Gt of expr * expr
+| Geq of expr * expr
 |	Add of expr * expr
 | Minus of expr * expr
 | Mul of expr * expr
