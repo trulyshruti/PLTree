@@ -13,9 +13,12 @@ type expr =
 |	Eq of expr * expr
 |	Lt of expr * expr
 |	Add of expr * expr
+| Minus of expr * expr
+| Mul of expr * expr
+| Div of expr * expr
 |	Id of string
 
-type stmt = 
+type stmt =
 	While of expr * stmt
 |	VarDec of string * expr
 |	Assn of string * expr
