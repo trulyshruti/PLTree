@@ -1,6 +1,6 @@
-(char str {'h' 'e' 'l' 'l' 'o' '\n'})
+char str ['h' 'e' 'l' 'l' 'o' '\n'];
 
-(print "Hello, World!\n")
+print : "Hello, World!\n";
 
-(print str)
+print : str;
 
