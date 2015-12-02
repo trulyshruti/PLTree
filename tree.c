@@ -6,23 +6,30 @@
 
 
 void print(struct tree *str) {
-	int width = str->width;
-	int i = 0;
-	while (i < width) {
-		struct tree *child = get_branch(str, i);
-		if (child) {
-			if (child->type == CHAR) {
-				putchar(child->data.c); 
-			} else if (child->type == INT) {
-				printf("%d", child->data.i);
-			} else if (child->type == DOUBLE) {
-				printf("%f", child->data.d);
-			} else if (child->type == TREE) {
-				print(child->data.t);
-			}
-		}
-		i++; 
+	if (str == NULL)
+		return;
+	
+	switch(str->type) {
+		case CHAR:
+			putchar(str->data.c);
+			break;
+		case INT:
+			printf("%d", str->data.i);
+			break;
+		case DOUBLE:
+			printf("%f", str->data.d);
+			break;
+		case TREE:
+			print(str->data.t);
+			break;
+		default:
+			break;
 	}
+
+	print(get_branch(str, 0));
+
+	print(get_ith_sibling(str, 1));
+
 }
 
 int equal(struct tree *lhs, struct tree *rhs) {
@@ -112,6 +119,44 @@ struct tree *add(struct tree *lhs, struct tree *rhs) {
 			break;
 		case DOUBLE:
 			return double_treemake(lhs->data.d + rhs->data.d, NULL);
+			break;
+		default:	
+			return NULL;
+	}
+}
+
+struct tree *mul(struct tree *lhs, struct tree *rhs) {
+	if (lhs->type != rhs->type)
+		return NULL;
+
+	switch (lhs->type) {
+		case CHAR:
+			return char_treemake(lhs->data.c * rhs->data.c, NULL);
+			break;
+		case INT:
+			return int_treemake(lhs->data.i * rhs->data.i, NULL);
+			break;
+		case DOUBLE:
+			return double_treemake(lhs->data.d * rhs->data.d, NULL);
+			break;
+		default:	
+			return NULL;
+	}
+}
+
+struct tree *divd(struct tree *lhs, struct tree *rhs) {
+	if (lhs->type != rhs->type)
+		return NULL;
+
+	switch (lhs->type) {
+		case CHAR:
+			return char_treemake(lhs->data.c / rhs->data.c, NULL);
+			break;
+		case INT:
+			return int_treemake(lhs->data.i / rhs->data.i, NULL);
+			break;
+		case DOUBLE:
+			return double_treemake(lhs->data.d / rhs->data.d, NULL);
 			break;
 		default:	
 			return NULL;
