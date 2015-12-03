@@ -59,7 +59,7 @@ while getopts ":c" opt; do
 					else
 						# compile given file; save output
 						cat $arg | $options > "${outdict}${progname}.c"
-						gcc -Wall -c "${outdict}${progname}.c" -o "${outdict}${progname}.o"
+						gcc -Wall -c  "${outdict}${progname}.c" -o "${outdict}${progname}.o"
 						gcc -Wall -c tree.c -o "${outdict}tree.o"
 						gcc -Wall -o "${outdict}${progname}" "${outdict}${progname}.o" "${outdict}tree.o"
 						touch "${rundict}${progname}${out}"
