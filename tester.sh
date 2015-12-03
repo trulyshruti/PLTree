@@ -3,6 +3,13 @@
 #
 # This script tests .tree files. 
 # usage: ./tester.sh [-c] [FILE.tree | treedir/]?
+# the '-c' flag compiles the program and compares expected output
+#
+# File structure:
+# 	.tree files go in tests/programs
+# 	expected AST files go in tests/output_exp/FILE_exp
+# 	expected compiled output files go in tests/output_res/FILE_res
+# All other directories are only used by the script
 #
 
 # define suffixes
@@ -86,11 +93,16 @@ while getopts ":c" opt; do
 							echo "Place ${progname}${exp} file in ${expdict} directory."
 							exit 2;
 						else
-							# run parser on input file; save output
-							cat $arg/$f | $options > "${outdict}${progname}${out}"
+							# compile given file; save output
+							cat $arg/$f | $options > "${outdict}${progname}.c"
+							gcc -Wall -c  "${outdict}${progname}.c" -o "${outdict}${progname}.o"
+							gcc -Wall -c tree.c -o "${outdict}tree.o"
+							gcc -Wall -o "${outdict}${progname}" "${outdict}${progname}.o" "${outdict}tree.o"
+							touch "${rundict}${progname}${out}"
+							"./${outdict}${progname}" > "${rundict}${progname}${out}"
 
 							# check if there are diffs
-							if ! [[ $(diff -bw ${outdict}${progname}${out} ${expdict}${progname}${exp}) ]]
+							if ! [[ $(diff -bw ${rundict}${progname}${out} ${expdict}${progname}${exp}) ]]
 							then
 								printf "${arg}/${progname}: \033[0;32mSUCCESS\033[0m\n"
 							else
@@ -101,12 +113,6 @@ while getopts ":c" opt; do
 				fi
 			done
 			exit 2;
-			compile () {
-				gcc -Wall -c tests/programs/hello.c -o tests/programs/hello.o
-				gcc -Wall -c tests/programs/tree.c -o tests/programs/tree.o 
-				gcc -Wall -o tests/programs/hello tests/programs/hello.o tests/programs/tree.o
-
-			}
 			;;
 
 		\?)
