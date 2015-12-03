@@ -34,6 +34,7 @@ let translate prog =
 	|	StrLit(s) -> Sast.StrLit(s), Sast.String
 	|	Void -> Sast.Void, Sast.Int
 	| FunCall(s,e) -> let (e,t) = expr env e in Sast.FunCall(s,e), t
+
 	| Eq(e1, e2) -> let (e1,t1) = expr env e1 in let (e2,t2) = expr env e2 in
 	if t1 = t2 then Sast.Eq(e1,e2), Sast.Bool else raise (Failure("Different types"))
 	| Neq(e1, e2) -> let (e1,t1) = expr env e1 in let (e2,t2) = expr env e2 in
@@ -46,14 +47,23 @@ let translate prog =
 	if t1 = t2 then Sast.Gt(e1,e2), Sast.Bool else raise (Failure("Different types"))
 	| Geq(e1, e2) -> let (e1,t1) = expr env e1 in let (e2,t2) = expr env e2 in
 	if t1 = t2 then Sast.Geq(e1,e2), Sast.Bool else raise (Failure("Different types"))
+
 	| Add(e1, e2) -> let (e1,t1) = expr env e1 in let (e2,t2) = expr env e2 in
-	if t1 = t2 then Sast.Add(e1,e2), Sast.Int else raise (Failure("Different types"))
+	if t1 = t2 then match t1 with Sast.Int | Sast.Double -> Sast.Add(e1,e2), t1
+		| _ -> raise(Failure("Addition operands must be of type int or double"))
+	else raise (Failure("Different types"))
 	| Minus(e1, e2) -> let (e1,t1) = expr env e1 in let (e2,t2) = expr env e2 in
-	if t1 = t2 then Sast.Minus(e1,e2), Sast.Int else raise (Failure("Different types"))
+	if t1 = t2 then match t1 with Sast.Int | Sast.Double -> Sast.Minus(e1,e2), t1
+		| _ -> raise(Failure("Subtraction operands must be of type int or double"))
+	else raise (Failure("Different types"))
 	| Mul(e1, e2) -> let (e1,t1) = expr env e1 in let (e2,t2) = expr env e2 in
-	if t1 = t2 then Sast.Mul(e1,e2), Sast.Int else raise (Failure("Different types"))
+	if t1 = t2 then match t1 with Sast.Int | Sast.Double -> Sast.Mul(e1,e2), t1
+		| _ -> raise(Failure("Multiplication operands must be of type int or double"))
+	else raise (Failure("Different types"))
 	| Div(e1, e2) -> let (e1,t1) = expr env e1 in let (e2,t2) = expr env e2 in
-	if t1 = t2 then Sast.Div(e1,e2), Sast.Int else raise (Failure("Different types"))
+	if t1 = t2 then match t1 with Sast.Int | Sast.Double -> Sast.Div(e1,e2), t1
+		| _ -> raise(Failure("Divison operands must be of type int or double"))
+	else raise (Failure("Different types"))
 	| Id(s) -> Sast.Id(s), Sast.Int in
 
 	(* TODO: include current globals in outer globals *)
