@@ -24,17 +24,21 @@ parser.ml parser.mli : parser.mly
 %.cmi : %.mli
 	ocamlc -c $<
 
+
 .PHONY : menhir
 menhir:
 	menhir -v parser.mly
 
-hello: hello.o tree.o
+.SECONDARY:
 
-hello.o: hello.c tree.h
+%: %.o tree.o
+	$(CC) $(CFLAGS) -o $@ $< tree.o
 
-hello.c: calc hello.tree
-	cat hello.tree | ./calc -c > hello.c
+%.o: %.c tree.h
+	$(CC) $(CFLAGS) -c $< -o $@
 
+%.c: %.tree calc
+	cat $< | ./calc -c > $@
 
 calculator.tar.gz : $(TARFILES)
 	cd .. && tar zcf calculator/calculator.tar.gz $(TARFILES:%=calculator/%)
