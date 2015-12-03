@@ -94,6 +94,6 @@ let translate prog =
 		(fun (m, env) stmt -> let (e,s) = transform_stmt env stmt in
 		let mapped = s::m in mapped, e) (mapped, empty_env) prog in
 
-	print_map transformed;
+	(* print_map transformed; *)
 
 	List.rev m
