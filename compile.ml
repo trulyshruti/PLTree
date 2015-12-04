@@ -70,9 +70,9 @@ let translate prog =
 
 	(* TODO: include current globals in outer globals *)
 	let rec transform_stmt env = function
-		While(e,s) -> env, let locs = env.locals in
-		let (e,t) = expr {env with globals=locs; locals=StringMap.empty} e in
-		if t = Sast.Bool then
+		While(e,s) -> env, let (e,t) = expr env e in
+		if t = Sast.Bool then let locs = env.locals in
+		let env = {env with globals=locs; locals=StringMap.empty} in
 		let (_,s) = transform_stmt env s in Sast.While(e,s)
 		else raise(Failure("While predicates must be of type bool"))
 	| VarDec(s,e) -> if StringMap.mem s env.locals then
