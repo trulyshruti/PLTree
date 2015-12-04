@@ -25,9 +25,10 @@ let translate prog =
 		locals = StringMap.empty;
 		statements = StringMap.empty } in
 
-	let merge_envs locs globs =
+	(* If there is a key in both maps, keeps value from first arg *)
+	let merge_maps =
 		let f = (fun k xo yo -> match xo, yo with Some x, _ -> xo
-			| None, yo -> yo ) in StringMap.merge f locs globs in
+			| None, yo -> yo ) in StringMap.merge f in
 
 	let rec expr env = function
 	Tree(e,l) -> let l = List.map (fun e -> let (e,_) = expr env e in e) l in
@@ -72,10 +73,9 @@ let translate prog =
 	else if StringMap.mem s env.globals then StringMap.find s env.globals
 	else raise(Failure(s ^ " does not exist or is not visible")) in
 
-	(* TODO: include current globals in outer globals *)
 	let rec transform_stmt env = function
 		While(e,seq) -> env, let (e,t) = expr env e in
-		if t = Sast.Bool then let locs = merge_envs env.locals env.globals in
+		if t = Sast.Bool then let locs = merge_maps env.locals env.globals in
 		let env = {env with globals=locs; locals=StringMap.empty} in
 		let (_,s) = transform_stmt env seq in Sast.While(e,s)
 		else raise(Failure("While predicates must be of type bool"))
