@@ -26,13 +26,13 @@ let translate prog =
 		statements = StringMap.empty } in
 
 	let rec expr env = function
-		Tree(e,l) -> let l = List.map (fun e -> let (e,_) = expr env e in e) l in
+	Tree(e,l) -> let l = List.map (fun e -> let (e,_) = expr env e in e) l in
 		let (e,t) = expr env e in Sast.Tree(e,l), t
-	|	IntLit(s) -> Sast.IntLit(s), Sast.Int
-	|	ChrLit(s) -> Sast.ChrLit(s), Sast.Char
-	|	FltLit(s) -> Sast.FltLit(s), Sast.Double
-	|	StrLit(s) -> Sast.StrLit(s), Sast.String
-	|	Void -> Sast.Void, Sast.Int
+	| IntLit(s) -> Sast.IntLit(s), Sast.Int
+	| ChrLit(s) -> Sast.ChrLit(s), Sast.Char
+	| FltLit(s) -> Sast.FltLit(s), Sast.Double
+	| StrLit(s) -> Sast.StrLit(s), Sast.String
+	| Void -> Sast.Void, Sast.Int
 	| FunCall(s,e) -> let (e,t) = expr env e in Sast.FunCall(s,e), t
 
 	| Eq(e1, e2) -> let (e1,t1) = expr env e1 in let (e2,t2) = expr env e2 in
@@ -69,7 +69,7 @@ let translate prog =
 	(* TODO: include current globals in outer globals *)
 	let rec transform_stmt env = function
 		While(e,s) -> env, let locs = env.locals in
-		let (e,t) = expr {env with globals=locs} e in
+		let (e,t) = expr {env with globals=locs; locals=StringMap.empty} e in
 		if t = Sast.Bool then
 		let (_,s) = transform_stmt env s in Sast.While(e,s)
 		else raise(Failure("While predicates must be of type bool"))
@@ -85,14 +85,15 @@ let translate prog =
 	Sast.string_of_vtype tSast ^ ", not " ^ Sast.string_of_vtype t))
 	else raise (Failure(s ^ " has not been declared"))
 	| Expr(e) -> env, let (e,_) = expr env e in Sast.Expr(e)
-	| Seq(l) -> env, let l = List.map
-	(fun stmt -> let (_,s) = transform_stmt env stmt in s) l in
-	Sast.Seq(l) in
+	| Seq(l) -> let (l,env) = map_stmts env l in env, Sast.Seq(List.rev l) and
 
-	let mapped = [] in
-	let (m, transformed) = List.fold_left
-		(fun (m, env) stmt -> let (e,s) = transform_stmt env stmt in
-		let mapped = s::m in mapped, e) (mapped, empty_env) prog in
+	map_stmts env stmts =
+		let mapped = [] in
+			List.fold_left (fun (m, env) stmt ->
+			let (e,s) = transform_stmt env stmt in
+			let mapped = s::m in mapped, e) (mapped, env) stmts in
+
+	let (m, transformed) = map_stmts empty_env prog in
 
 	print_map transformed;
 
