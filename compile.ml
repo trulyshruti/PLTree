@@ -38,8 +38,9 @@ let translate prog =
 	| FltLit(s) -> Sast.FltLit(s), Sast.Double
 	| StrLit(s) -> Sast.StrLit(s), Sast.String
 	| Void -> Sast.Void, Sast.Int
-	| FunCall(s,e) -> let (e,t) = expr env e in Sast.FunCall(s,e), t
-
+	| FunCall(s,e) -> if StringMap.mem s env.functions then
+	let (e,t) = expr env e in Sast.FunCall(s,e), t
+	else raise(Failure(s ^ " does not exist or is not visible"))
 	| Eq(e1, e2) -> let (e1,t1) = expr env e1 in let (e2,t2) = expr env e2 in
 	if t1 = t2 then Sast.Eq(e1,e2), Sast.Bool else raise (Failure("Different types"))
 	| Neq(e1, e2) -> let (e1,t1) = expr env e1 in let (e2,t2) = expr env e2 in
@@ -94,10 +95,9 @@ let translate prog =
 	| Seq(l) -> let (l,env) = map_stmts env l in env, Sast.Seq(List.rev l) and
 
 	map_stmts env stmts =
-		let mapped = [] in
-			List.fold_left (fun (m, env) stmt ->
+		List.fold_left (fun (m, env) stmt ->
 			let (e,s) = transform_stmt env stmt in
-			let mapped = s::m in mapped, e) (mapped, env) stmts in
+			let mapped = s::m in mapped, e) ([], env) stmts in
 
 	let (m, transformed) = map_stmts empty_env prog in
 
