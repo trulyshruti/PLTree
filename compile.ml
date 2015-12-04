@@ -64,7 +64,9 @@ let translate prog =
 	if t1 = t2 then match t1 with Sast.Int | Sast.Double -> Sast.Div(e1,e2), t1
 		| _ -> raise(Failure("Divison operands must be of type int or double"))
 	else raise (Failure("Different types"))
-	| Id(s) -> Sast.Id(s), Sast.Int in
+	| Id(s) -> if StringMap.mem s env.locals then StringMap.find s env.locals
+	else if StringMap.mem s env.globals then StringMap.find s env.globals
+	else raise(Failure(s ^ " does not exist or is not visible")) in
 
 	(* TODO: include current globals in outer globals *)
 	let rec transform_stmt env = function
