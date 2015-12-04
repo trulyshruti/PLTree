@@ -9,7 +9,7 @@ type env = {
 	statements: string StringMap.t;
 }
 
-let print_map env =
+let print_maps env =
 	let printtf = (fun key (expr,t) -> Printf.printf "%s -> " key;
 		print_endline (Sast.string_of_expr expr ^ " of " ^ Sast.string_of_vtype t)) in
 	let printvals = (fun key value -> printtf key value) in
@@ -27,9 +27,10 @@ let translate prog =
 
 	(* If there is a key in both maps, keeps value from first arg *)
 	let merge_maps =
-		let f = (fun k xo yo -> match xo, yo with Some x, _ -> xo
-			| None, yo -> yo ) in StringMap.merge f in
+		let f = (fun k xopt yopt -> match xopt, yopt with Some x, _ -> xopt
+			| None, yo -> yopt ) in StringMap.merge f in
 
+	(* environment -> Ast.expr -> (Sast.expr, Sast.vtype) *)
 	let rec expr env = function
 	Tree(e,l) -> let l = List.map (fun e -> let (e,_) = expr env e in e) l in
 		let (e,t) = expr env e in Sast.Tree(e,l), t
@@ -41,6 +42,7 @@ let translate prog =
 	| FunCall(s,e) -> if StringMap.mem s env.functions then
 	let (e,t) = expr env e in Sast.FunCall(s,e), t
 	else raise(Failure(s ^ " does not exist or is not visible"))
+
 	| Eq(e1, e2) -> let (e1,t1) = expr env e1 in let (e2,t2) = expr env e2 in
 	if t1 = t2 then Sast.Eq(e1,e2), Sast.Bool else raise (Failure("Different types"))
 	| Neq(e1, e2) -> let (e1,t1) = expr env e1 in let (e2,t2) = expr env e2 in
@@ -74,6 +76,7 @@ let translate prog =
 	else if StringMap.mem s env.globals then StringMap.find s env.globals
 	else raise(Failure(s ^ " does not exist or is not visible")) in
 
+	(* environment -> Ast.stmt -> (environment, Sast.stmt) *)
 	let rec transform_stmt env = function
 		While(e,seq) -> env, let (e,t) = expr env e in
 		if t = Sast.Bool then let locs = merge_maps env.locals env.globals in
@@ -92,15 +95,17 @@ let translate prog =
 	Sast.string_of_vtype tSast ^ ", not " ^ Sast.string_of_vtype t))
 	else raise (Failure(s ^ " has not been declared"))
 	| Expr(e) -> env, let (e,_) = expr env e in Sast.Expr(e)
-	| Seq(l) -> let (l,env) = map_stmts env l in env, Sast.Seq(List.rev l) and
+	| Seq(l) -> let (env,l) = map_stmts env l in env, Sast.Seq(List.rev l) and
 
+	(* environment -> Ast.stmt list -> (environment, Sast.stmt list) *)
+	(* Maps ast stmts to sast stmts, passing environment along *)
 	map_stmts env stmts =
-		List.fold_left (fun (m, env) stmt ->
+		List.fold_left (fun (env, m) stmt ->
 			let (e,s) = transform_stmt env stmt in
-			let mapped = s::m in mapped, e) ([], env) stmts in
+			let mapped = s::m in e, mapped) (env, []) stmts in
 
-	let (m, transformed) = map_stmts empty_env prog in
+	let (env, transformed) = map_stmts empty_env prog in
 
-	print_map transformed;
+	print_maps env;
 
-	List.rev m
+	List.rev transformed
