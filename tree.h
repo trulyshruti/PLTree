@@ -25,8 +25,8 @@ void init_tree (struct tree *root);
 
 void free_tree(struct tree *t);
 
-void inc_refcount(struct tree *t);
-void dec_refcount(struct tree *t);
+struct tree* inc_refcount(struct tree *t);
+struct tree* dec_refcount(struct tree *t);
 
 int equal(struct tree *lhs, struct tree *rhs);
 int lt(struct tree *lhs, struct tree *rhs);
