@@ -88,6 +88,34 @@ int gte(struct tree *lhs, struct tree *rhs) {
 }
 
 
+void free_tree(struct tree *t) {
+	struct tree *child;
+
+	if (t == NULL) {
+		return;
+	}
+
+	while(t->children) {
+		child = t->children;
+		t->children = child->sibling;
+		free_tree(child);
+	}
+
+	free(t);
+}
+
+
+
+void inc_refcount(struct tree *t) {
+	if (t)
+		t->refcount++;
+}
+
+void dec_refcount(struct tree *t) {
+	if (--(t->refcount) <= 0)
+		free_tree(t);
+}
+
 struct tree *sub(struct tree *lhs, struct tree *rhs) {
 	if (lhs->type != rhs->type)
 		return NULL;
@@ -272,6 +300,7 @@ int add_child (struct tree *root, struct tree *child) {
 	if (root == NULL) {
 		return -1;
 	}
+	inc_refcount(child);
 	if (root->children == NULL) {
 		root->children = child;
 		root->width = 1;
