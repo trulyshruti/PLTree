@@ -9,7 +9,7 @@ type env = {
 	statements: string StringMap.t;
 }
 
-let print_map env =
+let print_maps env =
 	let printtf = (fun key (expr,t) -> Printf.printf "%s -> " key;
 		print_endline (Sast.string_of_expr expr ^ " of " ^ Sast.string_of_vtype t)) in
 	let printvals = (fun key value -> printtf key value) in
@@ -25,29 +25,63 @@ let translate prog =
 		locals = StringMap.empty;
 		statements = StringMap.empty } in
 
+	(* If there is a key in both maps, keeps value from first arg *)
+	let merge_maps =
+		let f = (fun k xopt yopt -> match xopt, yopt with Some x, _ -> xopt
+			| None, yo -> yopt ) in StringMap.merge f in
+
+	(* environment -> Ast.expr -> (Sast.expr, Sast.vtype) *)
 	let rec expr env = function
-		Tree(e,l) -> let l = List.map (fun e -> let (e,_) = expr env e in e) l in
+	Tree(e,l) -> let l = List.map (fun e -> let (e,_) = expr env e in e) l in
 		let (e,t) = expr env e in Sast.Tree(e,l), t
-	|	IntLit(s) -> Sast.IntLit(s), Sast.Int
-	|	ChrLit(s) -> Sast.ChrLit(s), Sast.Char
-	|	FltLit(s) -> Sast.FltLit(s), Sast.Double
-	|	StrLit(s) -> Sast.StrLit(s), Sast.String
-	|	Void -> Sast.Void, Sast.Int
-	| FunCall(s,e) -> let (e,t) = expr env e in Sast.FunCall(s,e), t
+	| IntLit(s) -> Sast.IntLit(s), Sast.Int
+	| ChrLit(s) -> Sast.ChrLit(s), Sast.Char
+	| FltLit(s) -> Sast.FltLit(s), Sast.Double
+	| StrLit(s) -> Sast.StrLit(s), Sast.String
+	| Void -> Sast.Void, Sast.Int
+	| FunCall(s,e) -> if StringMap.mem s env.functions then
+	let (e,t) = expr env e in Sast.FunCall(s,e), t
+	else raise(Failure(s ^ " does not exist or is not visible"))
+
 	| Eq(e1, e2) -> let (e1,t1) = expr env e1 in let (e2,t2) = expr env e2 in
 	if t1 = t2 then Sast.Eq(e1,e2), Sast.Bool else raise (Failure("Different types"))
+	| Neq(e1, e2) -> let (e1,t1) = expr env e1 in let (e2,t2) = expr env e2 in
+	if t1 = t2 then Sast.Neq(e1,e2), Sast.Bool else raise (Failure("Different types"))
 	| Lt(e1, e2) -> let (e1,t1) = expr env e1 in let (e2,t2) = expr env e2 in
 	if t1 = t2 then Sast.Lt(e1,e2), Sast.Bool else raise (Failure("Different types"))
-	| Add(e1, e2) -> let (e1,t1) = expr env e1 in let (e2,t2) = expr env e2 in
-	if t1 = t2 then Sast.Add(e1,e2), Sast.Int else raise (Failure("Different types"))
-	| Id(s) -> Sast.Id(s), Sast.Int in
+	| Leq(e1, e2) -> let (e1,t1) = expr env e1 in let (e2,t2) = expr env e2 in
+	if t1 = t2 then Sast.Leq(e1,e2), Sast.Bool else raise (Failure("Different types"))
+	| Gt(e1, e2) -> let (e1,t1) = expr env e1 in let (e2,t2) = expr env e2 in
+	if t1 = t2 then Sast.Gt(e1,e2), Sast.Bool else raise (Failure("Different types"))
+	| Geq(e1, e2) -> let (e1,t1) = expr env e1 in let (e2,t2) = expr env e2 in
+	if t1 = t2 then Sast.Geq(e1,e2), Sast.Bool else raise (Failure("Different types"))
 
-	(* TODO: include current globals in outer globals *)
+	| Add(e1, e2) -> let (e1,t1) = expr env e1 in let (e2,t2) = expr env e2 in
+	if t1 = t2 then match t1 with Sast.Int | Sast.Double -> Sast.Add(e1,e2), t1
+		| _ -> raise(Failure("Addition operands must be of type int or double"))
+	else raise (Failure("Different types"))
+	| Minus(e1, e2) -> let (e1,t1) = expr env e1 in let (e2,t2) = expr env e2 in
+	if t1 = t2 then match t1 with Sast.Int | Sast.Double -> Sast.Minus(e1,e2), t1
+		| _ -> raise(Failure("Subtraction operands must be of type int or double"))
+	else raise (Failure("Different types"))
+	| Mul(e1, e2) -> let (e1,t1) = expr env e1 in let (e2,t2) = expr env e2 in
+	if t1 = t2 then match t1 with Sast.Int | Sast.Double -> Sast.Mul(e1,e2), t1
+		| _ -> raise(Failure("Multiplication operands must be of type int or double"))
+	else raise (Failure("Different types"))
+	| Div(e1, e2) -> let (e1,t1) = expr env e1 in let (e2,t2) = expr env e2 in
+	if t1 = t2 then match t1 with Sast.Int | Sast.Double -> Sast.Div(e1,e2), t1
+		| _ -> raise(Failure("Divison operands must be of type int or double"))
+	else raise (Failure("Different types"))
+	| Id(s) -> if StringMap.mem s env.locals then StringMap.find s env.locals
+	else if StringMap.mem s env.globals then StringMap.find s env.globals
+	else raise(Failure(s ^ " does not exist or is not visible")) in
+
+	(* environment -> Ast.stmt -> (environment, Sast.stmt) *)
 	let rec transform_stmt env = function
-		While(e,s) -> env, let locs = env.locals in
-		let (e,t) = expr {env with globals=locs} e in
-		if t = Sast.Bool then
-		let (_,s) = transform_stmt env s in Sast.While(e,s)
+		While(e,seq) -> env, let (e,t) = expr env e in
+		if t = Sast.Bool then let locs = merge_maps env.locals env.globals in
+		let env = {env with globals=locs; locals=StringMap.empty} in
+		let (_,s) = transform_stmt env seq in Sast.While(e,s)
 		else raise(Failure("While predicates must be of type bool"))
 	| VarDec(s,e) -> if StringMap.mem s env.locals then
 	raise (Failure (s ^ " is already declared")) else let (r,t) = expr env e in
@@ -61,15 +95,17 @@ let translate prog =
 	Sast.string_of_vtype tSast ^ ", not " ^ Sast.string_of_vtype t))
 	else raise (Failure(s ^ " has not been declared"))
 	| Expr(e) -> env, let (e,_) = expr env e in Sast.Expr(e)
-	| Seq(l) -> env, let l = List.map
-	(fun stmt -> let (_,s) = transform_stmt env stmt in s) l in
-	Sast.Seq(l) in
+	| Seq(l) -> let (env,l) = map_stmts env l in env, Sast.Seq(List.rev l) and
 
-	let mapped = [] in
-	let (m, transformed) = List.fold_left
-		(fun (m, env) stmt -> let (e,s) = transform_stmt env stmt in
-		let mapped = s::m in mapped, e) (mapped, empty_env) prog in
+	(* environment -> Ast.stmt list -> (environment, Sast.stmt list) *)
+	(* Maps ast stmts to sast stmts, passing environment along *)
+	map_stmts env stmts =
+		List.fold_left (fun (env, m) stmt ->
+			let (e,s) = transform_stmt env stmt in
+			let mapped = s::m in e, mapped) (env, []) stmts in
 
-	print_map transformed;
+	let (env, transformed) = map_stmts empty_env prog in
 
-	List.rev m
+	print_maps env;
+
+	List.rev transformed

@@ -10,8 +10,15 @@ type expr =
 |	Void
 |	FunCall of string * expr
 |	Eq of expr * expr
+| Neq of expr * expr
 |	Lt of expr * expr
+| Leq of expr * expr
+| Gt of expr * expr
+| Geq of expr * expr
 |	Add of expr * expr
+| Minus of expr * expr
+| Mul of expr * expr
+| Div of expr * expr
 |	Id of string
 
 type stmt =
@@ -40,8 +47,15 @@ let rec string_of_expr = function
 | Void -> "void"
 | FunCall(s,e) -> s ^ "(" ^ string_of_expr e ^ ")"
 | Eq(e1, e2) -> string_of_expr e1 ^ " == " ^ string_of_expr e2
+| Neq(e1, e2) -> string_of_expr e1 ^ " != " ^ string_of_expr e2
 | Lt(e1, e2) -> string_of_expr e1 ^ " < " ^ string_of_expr e2
+| Leq(e1, e2) -> string_of_expr e1 ^ " <= " ^ string_of_expr e2
+| Gt(e1, e2) -> string_of_expr e1 ^ " > " ^ string_of_expr e2
+| Geq(e1, e2) -> string_of_expr e1 ^ " >= " ^ string_of_expr e2
 | Add(e1, e2) -> string_of_expr e1 ^ " + " ^ string_of_expr e2
+| Minus(e1, e2) -> string_of_expr e1 ^ " - " ^ string_of_expr e2
+| Mul(e1, e2) -> string_of_expr e1 ^ " * " ^ string_of_expr e2
+| Div(e1, e2) -> string_of_expr e1 ^ " / " ^ string_of_expr e2
 | Id(s) -> s
 
 let rec string_of_stmt = function
