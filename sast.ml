@@ -7,22 +7,24 @@ type expr =
 |	ChrLit of string
 |	FltLit of string
 |	StrLit of string
+|	GetBranch of expr * expr
 |	Void
 |	FunCall of string * expr
 |	Eq of expr * expr
-| Neq of expr * expr
+|	Neq of expr * expr
 |	Lt of expr * expr
-| Leq of expr * expr
-| Gt of expr * expr
-| Geq of expr * expr
+|	Leq of expr * expr
+|	Gt of expr * expr
+|	Geq of expr * expr
 |	Add of expr * expr
-| Minus of expr * expr
-| Mul of expr * expr
-| Div of expr * expr
+|	Minus of expr * expr
+|	Mul of expr * expr
+|	Div of expr * expr
 |	Id of string
 
 type stmt =
 	While of expr * stmt
+|	FuncDec of string * stmt
 |	VarDec of string * expr
 |	Assn of string * expr
 |	Expr of expr
@@ -44,6 +46,7 @@ let rec string_of_expr = function
 | ChrLit(s) -> s
 | FltLit(s) -> s
 | StrLit(s) -> s
+| GetBranch(e1,e2) -> string_of_expr e1 ^ " " ^ string_of_expr e2
 | Void -> "void"
 | FunCall(s,e) -> s ^ "(" ^ string_of_expr e ^ ")"
 | Eq(e1, e2) -> string_of_expr e1 ^ " == " ^ string_of_expr e2
@@ -60,6 +63,7 @@ let rec string_of_expr = function
 
 let rec string_of_stmt = function
 	While(e,s) -> string_of_expr e ^ " " ^ string_of_stmt s
+| FuncDec(s,l) -> s
 | VarDec(s,e) -> s ^ " " ^ string_of_expr e
 | Assn(s,e) -> s ^ " = " ^ string_of_expr e
 | Expr(e) -> string_of_expr e
