@@ -27,6 +27,7 @@ type prog_els = { variables: Cast.stmt list; }
     | ChrLit(s) -> Cast.ChrLit(s)
     | FltLit(s) -> Cast.FltLit(s)
     | StrLit(s) -> Cast.StrLit(s)
+    | GetBranch(e1,e2) -> Cast.GetBranch(expr e1, expr e2)
     | Void -> Cast.Void
     | FunCall(s,e) -> Cast.FunCall(s, expr e)
     | Eq(e1,e2) -> Cast.Eq(expr e1,expr e2)
@@ -42,6 +43,7 @@ type prog_els = { variables: Cast.stmt list; }
     | Id(s) -> Cast.Id(s) in
   let rec stmt = function
     While(e,s) -> Cast.While(expr e, stmt s)
+    | FuncDec(s,seq) -> Cast.FuncDec(s,stmt seq)
     | VarDec(s,e) -> Cast.VarDec(s,expr e)
     | Assn(s,e) -> Cast.Assn(s,expr e)
     | Expr(e) -> Cast.Expr(expr e)

@@ -38,6 +38,7 @@ let translate prog =
 	| ChrLit(s) -> Sast.ChrLit(s), Sast.Char
 	| FltLit(s) -> Sast.FltLit(s), Sast.Double
 	| StrLit(s) -> Sast.StrLit(s), Sast.String
+	| GetBranch(e1,e2) -> let (e1,_) = expr env e1 in let (e2,t) = expr env e2 in Sast.GetBranch(e1,e2), t (* TODO *)
 	| Void -> Sast.Void, Sast.Int
 	| FunCall(s,e) -> if StringMap.mem s env.functions then
 	let (e,t) = expr env e in Sast.FunCall(s,e), t
@@ -83,6 +84,9 @@ let translate prog =
 		let env = {env with globals=locs; locals=StringMap.empty} in
 		let (_,s) = transform_stmt env seq in Sast.While(e,s)
 		else raise(Failure("While predicates must be of type bool"))
+	| FuncDec(s,seq) -> env, let locs = merge_maps env.locals env.globals in
+                let env = {env with globals=locs; locals=StringMap.empty} in
+                let (_,seq) = transform_stmt env seq in Sast.FuncDec(s,seq) (* TODO *)
 	| VarDec(s,e) -> if StringMap.mem s env.locals then
 	raise (Failure (s ^ " is already declared")) else let (r,t) = expr env e in
 	let locs = StringMap.add s (r,t) env.locals in {env with locals=locs},

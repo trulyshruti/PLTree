@@ -7,22 +7,24 @@ type expr =
 |	ChrLit of string
 |	FltLit of string
 |	StrLit of string
+|	GetBranch of expr * expr
 |	Void
 |	FunCall of string * expr
 |	Eq of expr * expr
-| Neq of expr * expr
+|	Neq of expr * expr
 |	Lt of expr * expr
-| Leq of expr * expr
-| Gt of expr * expr
-| Geq of expr * expr
+|	Leq of expr * expr
+|	Gt of expr * expr
+|	Geq of expr * expr
 |	Add of expr * expr
-| Minus of expr * expr
-| Mul of expr * expr
-| Div of expr * expr
+|	Minus of expr * expr
+|	Mul of expr * expr
+|	Div of expr * expr
 |	Id of string
 
 type stmt =
 	While of expr * stmt
+|	FuncDec of string * stmt
 |	VarDec of string * expr
 |	Assn of string * expr
 |	Expr of expr
