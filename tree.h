@@ -14,7 +14,7 @@ struct tree {
 	data_type type;
 	union data_u data;
 	int width;
-
+	int refcount;
 	struct tree *children;
 	struct tree *sibling;
 };
@@ -22,6 +22,11 @@ struct tree {
 void print (struct tree *str);
 
 void init_tree (struct tree *root);
+
+void free_tree(struct tree *t);
+
+void inc_refcount(struct tree *t);
+void dec_refcount(struct tree *t);
 
 int equal(struct tree *lhs, struct tree *rhs);
 int lt(struct tree *lhs, struct tree *rhs);
@@ -42,7 +47,6 @@ struct tree *tree_treemake(struct tree *t_data, struct tree *child, ...);
 struct tree *void_treemake(struct tree *child, ...);
 
 struct tree *treemake(data_type type, union data_u data, struct tree *child, va_list args);
-//struct tree *tree_of_string (char *str);
 int add_sibling (struct tree *root, struct tree *sibling, int n);
 int add_child (struct tree *root, struct tree *child);
 void set_type (struct tree *root, data_type type);
