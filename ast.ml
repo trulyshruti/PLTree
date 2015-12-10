@@ -46,26 +46,27 @@ let rec string_of_expr = function
 | ChrLit(s) -> s
 | FltLit(s) -> s
 | StrLit(s) -> s
-| GetBranch(e1,e2) -> string_of_expr e1 ^ " " ^ string_of_expr e2
+| GetBranch(e1,e2) -> string_of_expr e1 ^ "." ^ string_of_expr e2
 | Void -> "void"
-| FunCall(s,e) -> s ^ " " ^ string_of_expr e
-| Eq(e1, e2) -> string_of_expr e1 ^ " " ^ string_of_expr e2
-| Neq(e1, e2) -> string_of_expr e1 ^ " " ^ string_of_expr e2
-| Lt(e1, e2) -> string_of_expr e1 ^ " " ^ string_of_expr e2
-| Leq(e1, e2) -> string_of_expr e1 ^ " " ^ string_of_expr e2
-| Gt(e1, e2) -> string_of_expr e1 ^ " " ^ string_of_expr e2
-| Geq(e1, e2) -> string_of_expr e1 ^ " " ^ string_of_expr e2
-| Add(e1, e2) -> string_of_expr e1 ^ " " ^ string_of_expr e2
-| Minus(e1, e2) -> string_of_expr e1 ^ " " ^ string_of_expr e2
-| Mul(e1, e2) -> string_of_expr e1 ^ " " ^ string_of_expr e2
-| Div(e1, e2) -> string_of_expr e1 ^ " " ^ string_of_expr e2
+| FunCall(s,e) -> s ^ "(" ^ string_of_expr e ^ ")"
+| Eq(e1, e2) -> string_of_expr e1 ^ "==" ^ string_of_expr e2
+| Neq(e1, e2) -> string_of_expr e1 ^ "!=" ^ string_of_expr e2
+| Lt(e1, e2) -> string_of_expr e1 ^ "<" ^ string_of_expr e2
+| Leq(e1, e2) -> string_of_expr e1 ^ "<=" ^ string_of_expr e2
+| Gt(e1, e2) -> string_of_expr e1 ^ ">" ^ string_of_expr e2
+| Geq(e1, e2) -> string_of_expr e1 ^ ">=" ^ string_of_expr e2
+| Add(e1, e2) -> string_of_expr e1 ^ "+" ^ string_of_expr e2
+| Minus(e1, e2) -> string_of_expr e1 ^ "-" ^ string_of_expr e2
+| Mul(e1, e2) -> string_of_expr e1 ^ "*" ^ string_of_expr e2
+| Div(e1, e2) -> string_of_expr e1 ^ "/" ^ string_of_expr e2
 | Id(s) -> s
 
+(* mixing c-like and pltree-like syntax. not on purpose *)
 let rec string_of_stmt = function
-	While(e,s) -> string_of_expr e ^ " " ^ string_of_stmt s
-| FuncDec(s,l) -> s
-| VarDec(s,e) -> s ^ " " ^ string_of_expr e
-| Assn(s,e) -> s ^ " " ^ string_of_expr e
+	While(e,s) -> "While(" ^ string_of_expr e ^ ") {" ^ string_of_stmt s ^ "}"
+| FuncDec(s,l) -> s ^ "[" ^ string_of_stmt l ^ "]"
+| VarDec(s,e) -> s ^ " = " ^ string_of_expr e
+| Assn(s,e) -> s ^ " = " ^ string_of_expr e
 | Expr(e) -> string_of_expr e
 | Seq(l) ->  String.concat ", " (List.map string_of_stmt l)
 

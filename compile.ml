@@ -16,11 +16,17 @@ let print_maps env =
 	print_string "globals:";
 	StringMap.iter printvals env.globals;
 	print_string "\nlocals:";
-	StringMap.iter printvals env.locals
+	StringMap.iter printvals env.locals; print_string "\n"
 
 let translate prog =
+	let rec add_all m = function
+    	[] -> m
+    	| hd::tl -> add_all (StringMap.add hd "" m) tl in
+
+	let builtins = add_all StringMap.empty ["print"] in
+	
 	let empty_env = {
-		functions = StringMap.empty;
+		functions = builtins;
 		globals = StringMap.empty;
 		locals = StringMap.empty;
 		statements = StringMap.empty } in
@@ -43,7 +49,7 @@ let translate prog =
 	 	Sast.GetBranch(se1,se2), t
 	 | _ -> raise(Failure("Can only access branches with a number"))) (* TODO maybe bool/char? *)
 	 | _ -> raise(Failure("No branches to be gotten"))) (* TODO test this func *)
-	| Void -> Sast.Void, Sast.Int
+	| Void -> Sast.Void, Sast.Int (* TODO what type to return *)
 	| FunCall(s,e) -> if StringMap.mem s env.functions then
 	let (e,t) = expr env e in Sast.FunCall(s,e), t
 	else raise(Failure(s ^ " does not exist or is not visible"))
