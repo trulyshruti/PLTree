@@ -23,8 +23,8 @@ type expr =
 |	Id of string
 
 type stmt =
-	While of expr * stmt
-|	FuncDec of string * stmt
+	While of expr * stmt * stmt list
+|	FuncDec of string * stmt * stmt list
 |	VarDec of string * expr
 |	Assn of string * expr
 |	Expr of expr
@@ -62,8 +62,8 @@ let rec string_of_expr = function
 | Id(s) -> s
 
 let rec string_of_stmt = function
-	While(e,s) -> string_of_expr e ^ " " ^ string_of_stmt s
-| FuncDec(s,l) -> s
+	While(e,s,l) -> string_of_expr e ^ " " ^ string_of_stmt s
+| FuncDec(str,stmt,l) -> str
 | VarDec(s,e) -> s ^ " " ^ string_of_expr e
 | Assn(s,e) -> s ^ " = " ^ string_of_expr e
 | Expr(e) -> string_of_expr e

@@ -11,9 +11,9 @@ let print_vars vars = String.concat ", " (List.map (fun v -> Cast.gen_c 0 v) var
 let get_funcs prog =
    let rec get_funcs_list = function
     [] -> []
-    | hd::tl -> match hd with FuncDec(_,Seq(l)) -> List.concat
+    | hd::tl -> match hd with FuncDec(_,Seq(l),_) -> List.concat
               [ get_funcs_list l; hd::get_funcs_list tl ]
-              | While(_,Seq(l)) -> List.concat [get_funcs_list l; get_funcs_list tl ]
+              | While(_,Seq(l),_) -> List.concat [get_funcs_list l; get_funcs_list tl ]
 	      |_ -> get_funcs_list tl in
   get_funcs_list prog
 let print_funcs funcs = String.concat ", " (List.map (fun v -> Cast.gen_c 0 v) funcs)
@@ -44,8 +44,10 @@ type prog_els = { variables: Cast.stmt list; functions: Cast.stmt list; }
     | Div(e1,e2) -> Cast.Div(expr e1,expr e2)
     | Id(s) -> Cast.Id(s) in
   let rec stmt = function
-    While(e,s) -> Cast.While(expr e, stmt s)
-    | FuncDec(s,seq) -> Cast.FuncDec(s,stmt seq)
+    While(e,s,l) -> let l = List.map (fun e -> stmt e) l in
+	Cast.While(expr e, stmt s, l)
+    | FuncDec(s,seq,l) -> let l = List.map (fun e -> stmt e) l in
+	 Cast.FuncDec(s, stmt seq, l)
     | VarDec(s,e) -> Cast.VarDec(s,expr e)
     | Assn(s,e) -> Cast.Assn(s,expr e)
     | Expr(e) -> Cast.Expr(expr e)

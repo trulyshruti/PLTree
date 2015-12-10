@@ -35,6 +35,12 @@ let translate prog =
 	let merge_maps =
 		let f = (fun k xopt yopt -> match xopt, yopt with Some x, _ -> xopt
 			| None, yo -> yopt ) in StringMap.merge f in
+	
+	let rec get_vars_list = function
+    		Sast.Seq([]) -> []
+    		| Sast.Seq(hd::tl) -> (match hd with Sast.VarDec(_,_) -> let l = Sast.Seq(tl) in hd::get_vars_list l
+              		| _ -> get_vars_list(Sast.Seq(tl)))
+		| _ -> [] in
 
 	(* environment -> Ast.expr -> (Sast.expr, Sast.vtype) *)
 	let rec expr env = function
@@ -92,11 +98,13 @@ let translate prog =
 		While(e,seq) -> env, let (e,t) = expr env e in
 		if t = Sast.Bool then let locs = merge_maps env.locals env.globals in
 		let env = {env with globals=locs; locals=StringMap.empty} in
-		let (_,s) = transform_stmt env seq in Sast.While(e,s)
+		let (_,s) = transform_stmt env seq in let vars = get_vars_list s in
+Sast.While(e,s,vars)
 		else raise(Failure("While predicates must be of type bool"))
 	| FuncDec(s,seq) -> env, let locs = merge_maps env.locals env.globals in
                 let env = {env with globals=locs; locals=StringMap.empty} in
-                let (_,seq) = transform_stmt env seq in Sast.FuncDec(s,seq) (* TODO *)
+                let (_,seq) = transform_stmt env seq in let vars = get_vars_list seq in
+		 Sast.FuncDec(s,seq,vars) (* TODO *)
 	| VarDec(s,e) -> if StringMap.mem s env.locals then
 	raise (Failure (s ^ " is already declared")) else let (r,t) = expr env e in
 	let locs = StringMap.add s (r,t) env.locals in {env with locals=locs},
