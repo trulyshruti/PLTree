@@ -38,7 +38,11 @@ let translate prog =
 	| ChrLit(s) -> Sast.ChrLit(s), Sast.Char
 	| FltLit(s) -> Sast.FltLit(s), Sast.Double
 	| StrLit(s) -> Sast.StrLit(s), Sast.String
-	| GetBranch(e1,e2) -> let (e1,_) = expr env e1 in let (e2,t) = expr env e2 in Sast.GetBranch(e1,e2), t (* TODO *)
+	| GetBranch(e1,e2) ->(match e1 with Tree(e,l) -> let (se2,st) = expr env e2 in
+	 (match st with Sast.Int | Sast.Double -> let (se1,t) = expr env e in
+	 	Sast.GetBranch(se1,se2), t
+	 | _ -> raise(Failure("Can only access branches with a number"))) (* TODO maybe bool/char? *)
+	 | _ -> raise(Failure("No branches to be gotten"))) (* TODO test this func *)
 	| Void -> Sast.Void, Sast.Int
 	| FunCall(s,e) -> if StringMap.mem s env.functions then
 	let (e,t) = expr env e in Sast.FunCall(s,e), t
