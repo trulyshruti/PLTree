@@ -6,18 +6,20 @@ let get_vars prog =
     | hd::tl -> match hd with VarDec(_,_) -> hd::get_vars_list tl
               | _ -> get_vars_list tl in
   get_vars_list prog
-let print_vars vars = Cast.string_of_program vars
+let print_vars vars = String.concat ", " (List.map (fun v -> Cast.gen_c 0 v) vars)
 
 let get_funcs prog =
-   (* let rec get_funcs_list = function
+   let rec get_funcs_list = function
     [] -> []
-    | hd::tl -> match hd with FuncDec(_,_) -> hd::get_funcs_list tl
-              | _ -> get_funcs_list tl in
-  get_vars_list *) prog
-let print_funcs funcs = Cast.string_of_program funcs
+    | hd::tl -> match hd with FuncDec(_,Seq(l),_) -> List.concat
+              [ get_funcs_list l; hd::get_funcs_list tl ]
+              | While(_,Seq(l),_) -> List.concat [get_funcs_list l; get_funcs_list tl ]
+	      |_ -> get_funcs_list tl in
+  get_funcs_list prog
+let print_funcs funcs = String.concat ", " (List.map (fun v -> Cast.gen_c 0 v) funcs)
 
 (* TODO: make variables a VarDec list *)
-type prog_els = { variables: Cast.stmt list; }
+type prog_els = { variables: Cast.stmt list; functions: Cast.stmt list; }
 
  let transform prog =
   let rec expr = function
@@ -42,8 +44,10 @@ type prog_els = { variables: Cast.stmt list; }
     | Div(e1,e2) -> Cast.Div(expr e1,expr e2)
     | Id(s) -> Cast.Id(s) in
   let rec stmt = function
-    While(e,s) -> Cast.While(expr e, stmt s)
-    | FuncDec(s,seq) -> Cast.FuncDec(s,stmt seq)
+    While(e,s,l) -> let l = List.map (fun e -> stmt e) l in
+	Cast.While(expr e, stmt s, l)
+    | FuncDec(s,seq,l) -> let l = List.map (fun e -> stmt e) l in
+	 Cast.FuncDec(s, stmt seq, l)
     | VarDec(s,e) -> Cast.VarDec(s,expr e)
     | Assn(s,e) -> Cast.Assn(s,expr e)
     | Expr(e) -> Cast.Expr(expr e)
@@ -51,7 +55,8 @@ type prog_els = { variables: Cast.stmt list; }
       Cast.Seq(l) in
   let vars = get_vars prog in
   let funcs = get_funcs prog in {
-    variables = List.map (fun v -> stmt v) vars; }
+    variables = List.map (fun v -> stmt v) vars;
+    functions = List.map (fun f -> stmt f) funcs }
 
 let execute_prog prog =
-  let pe = transform prog in print_endline (print_vars pe.variables)
+  let pe = transform prog in print_endline ("Vars: " ^ print_vars pe.variables ^ "\n\nFuncs: " ^ print_funcs pe.functions)
