@@ -114,13 +114,15 @@ let translate prog =
 	raise (Failure (s ^ " is already declared")) else let (r,t) = expr env e in
 	let locs = StringMap.add s (r,t) env.locals in {env with locals=locs},
 	Sast.VarDec(s,r)
-	| Assn(s,e) -> if StringMap.mem s env.locals then
-	let (eSast,tSast) = StringMap.find s env.locals in
-	let (r,t) = expr env e in if tSast = t then
-	let locs = StringMap.add s (r,t) env.locals in {env with locals=locs},
-	Sast.Assn(s, r) else raise(Failure(s ^ " is defined as " ^
-	Sast.string_of_vtype tSast ^ ", not " ^ Sast.string_of_vtype t))
-	else raise (Failure(s ^ " has not been declared"))
+	| Assn(s,e) -> let (eSast,tSast) = if StringMap.mem s env.locals then
+	StringMap.find s env.locals else if StringMap.mem s env.globals then
+	StringMap.find s env.globals else raise (Failure(s ^
+		" has not been declared"))
+	in let (r,t) = expr env e in if tSast = t then
+	let locs = StringMap.add s (r,t) env.locals in
+	{env with locals=locs}, Sast.Assn(s, r) else
+	raise(Failure(s ^ " is defined as " ^ Sast.string_of_vtype tSast ^
+		", not " ^ Sast.string_of_vtype t))
 
 	| Expr(e) -> env, let (e,_) = expr env e in Sast.Expr(e)
 	| Seq(l) -> let (env,l) = map_stmts env l in env, Sast.Seq(List.rev l) and
