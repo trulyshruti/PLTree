@@ -54,6 +54,7 @@ let rec gen_c_expr =
 				"NULL)"
 			else
 				"\n" ^ string_tab (n+1) (gen_c_tree_list (n+1) children ^ "NULL)")
+|	GetBranch(e1,e2) -> "" (* TODO *)
 |	Eq(v1, v2) -> ("equal(" ^ gen_c_expr n v1 ^ ", " ^ gen_c_expr n v2 ^ ")")
 |	Neq(v1, v2) -> ("not-equal(" ^ gen_c_expr n v1 ^ ", " ^ gen_c_expr n v2 ^ ")")
 |	Lt(v1, v2) -> ("lt(" ^ gen_c_expr n v1 ^ ", " ^ gen_c_expr n v2 ^ ")")
@@ -73,6 +74,7 @@ let rec gen_c_expr =
 
 let rec gen_c = function n -> function
 	While(x, y) -> string_tab n ("while ("^(gen_c_expr n x) ^ ") { \n" ^ (gen_c (n+1) y) ^ "\n" ^  string_tab n "}")
+|	FuncDec(s,e) -> "" (* TODO *)
 |	VarDec(v2, v3) -> string_tab n ("struct tree * " ^ v2 ^ " = " ^ gen_c_expr n v3 ^ ";")
 |	Assn(v1, v2) -> string_tab n ("" ^ v1 ^ " = " ^ gen_c_expr n v2 ^ ";")
 |	Expr(v1) -> string_tab n (gen_c_expr n v1)
@@ -98,6 +100,7 @@ let rec eval_expr = function n ->
 				", [])"
 			else
 				", \n" ^ string_tab (n+1) (eval_tree_list (n+1) children ^ ")")
+|	GetBranch(e1,e2) -> eval_expr n e1 ^ "." ^ eval_expr n e2 (* TODO *)
 |	Eq(v1, v2) -> ("Eq(" ^ eval_expr n v1 ^ ", " ^ eval_expr n v2 ^ ")")
 |	Neq(v1, v2) -> ("Neq(" ^ eval_expr n v1 ^ ", " ^ eval_expr n v2 ^ ")")
 |	Lt(v1, v2) -> ("Lt(" ^ eval_expr n v1 ^ ", " ^ eval_expr n v2 ^ ")")
@@ -117,6 +120,7 @@ let rec eval_expr = function n ->
 
 let rec eval = function n -> function
 	While(x, y) -> string_tab n ("While("^(eval_expr n x) ^ ",\n" ^ (eval (n+1) y) ^ "\n" ^  string_tab n ")")
+|	FuncDec(str,stmt) -> str (* TODO *)
 |	VarDec(v2, v3) -> string_tab n ("VarDec(" ^ v2 ^ ", " ^ eval_expr n v3 ^ ")")
 |	Assn(v1, v2) -> string_tab n ("Assn(" ^ v1 ^ ", " ^ eval_expr n v2 ^ ")")
 |	Expr(v1) -> string_tab n (eval_expr n v1)
