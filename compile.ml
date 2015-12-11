@@ -3,12 +3,13 @@ open Ast
 module StringMap = Map.Make(String)
 
 type env = {
-	functions: string StringMap.t;
+	functions: string StringMap.t; (* Can this just be a list? *)
 	globals: (Sast.expr * Sast.vtype) StringMap.t;
 	locals: (Sast.expr * Sast.vtype) StringMap.t;
 	statements: string StringMap.t;
 }
 
+(* prints the variables of an environment. For debugging. Could print funcs *)
 let print_maps env =
 	let printtf = (fun key (expr,t) -> Printf.printf "%s -> " key;
 		print_endline (Sast.string_of_expr expr ^ " of " ^ Sast.string_of_vtype t)) in
@@ -20,11 +21,10 @@ let print_maps env =
 
 let translate prog =
 	let rec add_all m = function
-    	[] -> m
-    	| hd::tl -> add_all (StringMap.add hd "" m) tl in
-
+		[] -> m
+		| hd::tl -> add_all (StringMap.add hd "" m) tl in
 	let builtins = add_all StringMap.empty ["print"] in
-	
+
 	let empty_env = {
 		functions = builtins;
 		globals = StringMap.empty;
@@ -35,11 +35,13 @@ let translate prog =
 	let merge_maps =
 		let f = (fun k xopt yopt -> match xopt, yopt with Some x, _ -> xopt
 			| None, yo -> yopt ) in StringMap.merge f in
-	
+
+	(* Extracts vardecs from a list of Sast.stmts *)
 	let rec get_vars_list = function
-    		Sast.Seq([]) -> []
-    		| Sast.Seq(hd::tl) -> (match hd with Sast.VarDec(_,_) -> let l = Sast.Seq(tl) in hd::get_vars_list l
-              		| _ -> get_vars_list(Sast.Seq(tl)))
+		Sast.Seq([]) -> []
+		| Sast.Seq(hd::tl) -> (match hd with Sast.VarDec(_,_) ->
+			let l = Sast.Seq(tl) in hd::get_vars_list l
+			| _ -> get_vars_list(Sast.Seq(tl)))
 		| _ -> [] in
 
 	(* environment -> Ast.expr -> (Sast.expr, Sast.vtype) *)
@@ -50,9 +52,9 @@ let translate prog =
 	| ChrLit(s) -> Sast.ChrLit(s), Sast.Char
 	| FltLit(s) -> Sast.FltLit(s), Sast.Double
 	| StrLit(s) -> Sast.StrLit(s), Sast.String
-	| GetBranch(e1,e2) ->(match e1 with Tree(e,l) -> let (se2,st) = expr env e2 in
-	 (match st with Sast.Int | Sast.Double -> let (se1,t) = expr env e in
-	 	Sast.GetBranch(se1,se2), t
+	| GetBranch(e1,e2) ->(match e1 with Tree(e,l) ->
+		let (se2,st) = expr env e2 in (match st with Sast.Int | Sast.Double ->
+			let (se1,t) = expr env e in Sast.GetBranch(se1,se2), t
 	 | _ -> raise(Failure("Can only access branches with a number"))) (* TODO maybe bool/char? *)
 	 | _ -> raise(Failure("No branches to be gotten"))) (* TODO test this func *)
 	| Void -> Sast.Void, Sast.Int (* TODO what type to return *)
@@ -73,6 +75,7 @@ let translate prog =
 	| Geq(e1, e2) -> let (e1,t1) = expr env e1 in let (e2,t2) = expr env e2 in
 	if t1 = t2 then Sast.Geq(e1,e2), Sast.Bool else raise (Failure("Different types"))
 
+	(* Allow arithmetic on chars? *)
 	| Add(e1, e2) -> let (e1,t1) = expr env e1 in let (e2,t2) = expr env e2 in
 	if t1 = t2 then match t1 with Sast.Int | Sast.Double -> Sast.Add(e1,e2), t1
 		| _ -> raise(Failure("Addition operands must be of type int or double"))
@@ -95,16 +98,18 @@ let translate prog =
 
 	(* environment -> Ast.stmt -> (environment, Sast.stmt) *)
 	let rec transform_stmt env = function
+		(* Change Ast stuff to Sast and keep track of vars new to this scope *)
 		While(e,seq) -> env, let (e,t) = expr env e in
 		if t = Sast.Bool then let locs = merge_maps env.locals env.globals in
 		let env = {env with globals=locs; locals=StringMap.empty} in
 		let (_,s) = transform_stmt env seq in let vars = get_vars_list s in
-Sast.While(e,s,vars)
+		Sast.While(e,s,vars)
 		else raise(Failure("While predicates must be of type bool"))
 	| FuncDec(s,seq) -> env, let locs = merge_maps env.locals env.globals in
-                let env = {env with globals=locs; locals=StringMap.empty} in
-                let (_,seq) = transform_stmt env seq in let vars = get_vars_list seq in
-		 Sast.FuncDec(s,seq,vars) (* TODO *)
+		let env = {env with globals=locs; locals=StringMap.empty} in
+		let (_,seq) = transform_stmt env seq in let vars = get_vars_list seq in
+		Sast.FuncDec(s,seq,vars) (* TODO *)
+
 	| VarDec(s,e) -> if StringMap.mem s env.locals then
 	raise (Failure (s ^ " is already declared")) else let (r,t) = expr env e in
 	let locs = StringMap.add s (r,t) env.locals in {env with locals=locs},
@@ -116,6 +121,7 @@ Sast.While(e,s,vars)
 	Sast.Assn(s, r) else raise(Failure(s ^ " is defined as " ^
 	Sast.string_of_vtype tSast ^ ", not " ^ Sast.string_of_vtype t))
 	else raise (Failure(s ^ " has not been declared"))
+
 	| Expr(e) -> env, let (e,_) = expr env e in Sast.Expr(e)
 	| Seq(l) -> let (env,l) = map_stmts env l in env, Sast.Seq(List.rev l) and
 
@@ -128,6 +134,6 @@ Sast.While(e,s,vars)
 
 	let (env, transformed) = map_stmts empty_env prog in
 
-	print_maps env;
+	(* print_maps env; *)
 
 	List.rev transformed

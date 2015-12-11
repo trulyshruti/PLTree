@@ -32,6 +32,19 @@ type stmt =
 
 type program = stmt list
 
+let rec get_vars_list = function
+	[] -> []
+	| hd::tl -> match hd with VarDec(_,_) -> hd::get_vars_list tl
+		| _ -> get_vars_list tl
+
+let rec get_funcs_list = function
+	[] -> []
+	| hd::tl -> match hd with FuncDec(_,Seq(l),_) -> List.concat
+		[ get_funcs_list l; hd::get_funcs_list tl ]
+		| While(_,Seq(l),_) -> List.concat
+		[get_funcs_list l; get_funcs_list tl ]
+		|_ -> get_funcs_list tl
+
 let string_of_vtype = function
 	Int -> "int"
 | Char -> "char"
@@ -70,4 +83,4 @@ let rec string_of_stmt = function
 | Seq(l) ->  String.concat ", " (List.map string_of_stmt l)
 
 let string_of_program stmts =
-  String.concat " " (List.map string_of_stmt stmts)
+	String.concat " " (List.map string_of_stmt stmts)
