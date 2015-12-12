@@ -52,11 +52,10 @@ let translate prog =
 	| ChrLit(s) -> Sast.ChrLit(s), Sast.Char
 	| FltLit(s) -> Sast.FltLit(s), Sast.Double
 	| StrLit(s) -> Sast.StrLit(s), Sast.String
-	| GetBranch(e1,e2) ->(match e1 with Tree(e,l) ->
-		let (se2,st) = expr env e2 in (match st with Sast.Int | Sast.Double ->
-			let (se1,t) = expr env e in Sast.GetBranch(se1,se2), t
+	| GetBranch(e1,e2) ->
+		let (se2,st) = expr env e2 in (match st with Sast.Int ->
+			let (se1,t) = expr env e1 in Sast.GetBranch(se1,se2), t
 	 | _ -> raise(Failure("Can only access branches with a number"))) (* TODO maybe bool/char? *)
-	 | _ -> raise(Failure("No branches to be gotten"))) (* TODO test this func *)
 	| Void -> Sast.Void, Sast.Int (* TODO what type to return *)
 	| FunCall(s,e) -> if StringMap.mem s env.functions then
 	let (e,t) = expr env e in Sast.FunCall(s,e), t
@@ -92,8 +91,8 @@ let translate prog =
 	if t1 = t2 then match t1 with Sast.Int | Sast.Double -> Sast.Div(e1,e2), t1
 		| _ -> raise(Failure("Divison operands must be of type int or double"))
 	else raise (Failure("Different types"))
-	| Id(s) -> if StringMap.mem s env.locals then StringMap.find s env.locals
-	else if StringMap.mem s env.globals then StringMap.find s env.globals
+	| Id(s) -> if StringMap.mem s env.locals then let (e1, e2) = StringMap.find s env.locals in (Sast.Id(s), e2)
+	else if StringMap.mem s env.globals then let (e1, e2) = StringMap.find s env.globals in (Sast.Id(s), e2)
 	else raise(Failure(s ^ " does not exist or is not visible")) in
 
 	(* environment -> Ast.stmt -> (environment, Sast.stmt) *)

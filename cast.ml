@@ -83,7 +83,7 @@ let rec gen_c_expr =
 				"NULL)"
 			else
 				"\n" ^ string_tab (n+1) (gen_c_tree_list (n+1) children ^ "NULL)")
-| GetBranch(tree, expr) -> "" (* TODO *)
+| GetBranch(tree, expr) -> "get_branch_t(" ^ gen_c_expr n tree ^ ", " ^ gen_c_expr n expr ^ ")"
 |	Eq(v1, v2) -> ("equal(" ^ gen_c_expr n v1 ^ ", " ^ gen_c_expr n v2 ^ ")")
 |	Neq(v1, v2) -> ("not-equal(" ^ gen_c_expr n v1 ^ ", " ^ gen_c_expr n v2 ^ ")")
 |	Lt(v1, v2) -> ("lt(" ^ gen_c_expr n v1 ^ ", " ^ gen_c_expr n v2 ^ ")")
@@ -103,9 +103,9 @@ let rec gen_c_expr =
 
 let rec gen_c = function n -> function
 	While(x, y, l) -> string_tab n ("while ("^(gen_c_expr n x) ^ ") { \n" ^ (gen_c (n+1) y) ^ "\n" ^  string_tab n "}")
-|	VarDec(v2, v3) -> string_tab n ("struct tree * " ^ v2 ^ " = " ^ gen_c_expr n v3 ^ ";")
+|	VarDec(v2, v3) -> string_tab n ("struct tree * " ^ v2 ^ " = " ^ gen_c_expr n v3 ^ "; inc_refcount(" ^ v2 ^ ");")
 |	FuncDec(str, stmt, l) -> str ^ "(){}" (* TODO *)
-|	Assn(v1, v2) -> string_tab n ("" ^ v1 ^ " = " ^ gen_c_expr n v2 ^ ";")
+|	Assn(v1, v2) -> string_tab n ("" ^ v1 ^ " = " ^ gen_c_expr n v2 ^ "; inc_refcount(" ^ v1 ^ ");")
 |	Expr(v1) -> string_tab n (gen_c_expr n v1)
 |	Seq(v1) -> let rec gen_c_seq = function
 				hd::tl -> gen_c n hd ^ ";\n" ^ gen_c_seq tl

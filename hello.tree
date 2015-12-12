@@ -3,7 +3,7 @@ char i 'i';
 char nl '\n';
 
 print : [h i nl];
-char str {'a'} ['h' 'e' 'l' 'l' 'o' '\n'];
+char str {'h'} ['e' 'l' 'l' 'o' '\n'];
 
 print : "Hello, World!\n";
 
@@ -11,6 +11,11 @@ print : str;
 
 int a 0;
 
+string b ["this" "is" "a" "test"];
+
+print : b.3;
+
+print : "\n";
 
 while [a < 10]
 	print : [a ' ' (a+1)];

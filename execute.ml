@@ -47,6 +47,6 @@ let transform prog =
 
 (* Use the string_of funcs in cast.ml to make C file *)
 let execute_prog prog = let pe = transform prog in
-	print_endline ("Vars: " ^ Cast.gen_c_prog pe.variables ^
-	"\n\nFuncs: " ^ Cast.gen_c_prog pe.functions ^ "\n\nEverything: " ^
+	print_endline ((*"Vars: " ^ Cast.gen_c_prog pe.variables ^
+	"\n\nFuncs: " ^ Cast.gen_c_prog pe.functions ^ "\n\nEverything: " ^ *)
 	Cast.string_of_program pe.all_statements)

@@ -4,8 +4,7 @@
 #include <stdarg.h>
 #include "tree.h"
 
-
-void print(struct tree *str) {
+void print_dfs(struct tree *str) {
 	if (str == NULL)
 		return;
 	
@@ -20,17 +19,25 @@ void print(struct tree *str) {
 			printf("%f", str->data.d);
 			break;
 		case TREE:
-			print(str->data.t);
+			print_dfs(str->data.t);
 			break;
 		default:
 			break;
 	}
 
-	print(get_branch(str, 0));
+	print_dfs(get_branch(str, 0));
 
-	print(get_ith_sibling(str, 1));
+	print_dfs(get_ith_sibling(str, 1));
 
 }
+
+void print(struct tree *str) {
+	struct tree *s = str->sibling;
+	str->sibling = NULL;
+	print_dfs(str);
+	str->sibling = s;
+}
+
 
 int equal(struct tree *lhs, struct tree *rhs) {
 
@@ -431,6 +438,15 @@ struct tree *get_ith_sibling(struct tree *root, int i) {
 
 	return get_ith_sibling(root->sibling, i-1);
 }
+
+struct tree *get_branch_t(struct tree *root, struct tree *branch) {
+	struct tree *child;
+	inc_refcount(branch);
+	child = get_branch(root, branch->data.i);
+	dec_refcount(branch);
+	return child;
+}
+
 
 struct tree *get_branch(struct tree *root, int branch) {
 	return get_ith_sibling(root->children, branch);

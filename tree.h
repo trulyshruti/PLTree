@@ -52,6 +52,7 @@ int add_child (struct tree *root, struct tree *child);
 void set_type (struct tree *root, data_type type);
 data_type get_type(struct tree *root);
 struct tree *get_ith_sibling(struct tree *root, int i);
+struct tree *get_branch_t(struct tree *root, struct tree *branch);
 struct tree *get_branch(struct tree *root, int branch);
 
 #endif

@@ -59,7 +59,7 @@ let rec string_of_expr = function
 | ChrLit(s) -> s
 | FltLit(s) -> s
 | StrLit(s) -> s
-| GetBranch(e1,e2) -> string_of_expr e1 ^ " " ^ string_of_expr e2
+| GetBranch(e1,e2) -> string_of_expr e1 ^ "." ^ string_of_expr e2
 | Void -> "void"
 | FunCall(s,e) -> s ^ "(" ^ string_of_expr e ^ ")"
 | Eq(e1, e2) -> string_of_expr e1 ^ " == " ^ string_of_expr e2

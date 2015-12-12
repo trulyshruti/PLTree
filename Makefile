@@ -37,8 +37,8 @@ menhir:
 %.o: %.c tree.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
-%.c: %.tree calc
-	cat $< | ./calc -c > $@
+%.c: %.tree pltree
+	cat $< | ./pltree -c > $@
 
 calculator.tar.gz : $(TARFILES)
 	cd .. && tar zcf calculator/calculator.tar.gz $(TARFILES:%=calculator/%)
