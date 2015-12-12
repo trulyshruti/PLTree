@@ -4,7 +4,10 @@
 #include <stdarg.h>
 #include "tree.h"
 
-void print_dfs(struct tree *str) {
+void print(struct tree *str) {
+	int i = 0;
+	int len = str->width;
+
 	if (str == NULL)
 		return;
 	
@@ -19,23 +22,16 @@ void print_dfs(struct tree *str) {
 			printf("%f", str->data.d);
 			break;
 		case TREE:
-			print_dfs(str->data.t);
+			print(str->data.t);
 			break;
 		default:
 			break;
 	}
 
-	print_dfs(get_branch(str, 0));
+	while (i < len) {	
+		print(get_branch(str, i++));
+	}
 
-	print_dfs(get_ith_sibling(str, 1));
-
-}
-
-void print(struct tree *str) {
-	struct tree *s = str->sibling;
-	str->sibling = NULL;
-	print_dfs(str);
-	str->sibling = s;
 }
 
 
@@ -129,24 +125,20 @@ int gte(struct tree *lhs, struct tree *rhs) {
 	return lt(rhs, lhs);
 }
 
+void dec_refcount_child(void *child) {
+	dec_refcount((struct tree *)child);
+}
 
 void free_tree(struct tree *t) {
-	struct tree *child;
-
 	if (t == NULL) {
 		return;
 	}
 
-	while(t->children) {
-		child = t->children;
-		t->children = child->sibling;
-		dec_refcount(child);
-	}
-
+	traverse_list(t->children, dec_refcount_child);
+	free_list(t->children);
 	if (t->type == TREE) {
 		dec_refcount(t->data.t);
 	}
-
 	free(t);
 }
 
@@ -160,7 +152,7 @@ struct tree* inc_refcount(struct tree *t) {
 	return t;
 }
 
-struct tree* dec_refcount(struct tree *t) {
+struct tree *dec_refcount(struct tree *t) {
 	if (t) {
 		if (--(t->refcount) <= 0) {
 			free_tree(t);
@@ -292,10 +284,10 @@ struct tree *divd(struct tree *lhs, struct tree *rhs) {
 }
 
 void init_tree(struct tree *root) {
-	root->children = NULL;
-	root->sibling = NULL;
+	root->children = malloc(sizeof(struct List));
 	root->type = VOID;
 	root->width = 0;
+	init_list(root->children);
 }
 
 struct tree *int_treemake(int i_data, struct tree *child, ...) {
@@ -378,25 +370,11 @@ struct tree *treemake(data_type type, union data_u data, struct tree *child,  va
 
 	while (child != NULL) {
 		add_child(root, child);
+		inc_refcount(child);
 		child = va_arg(args, struct tree *);
 	}
 
 	return root;
-}
-
-int add_sibling (struct tree *root, struct tree *sibling, int n) {
-	if (root == NULL)
-		return -1;
-	
-	inc_refcount(sibling);
-
-	if (root->sibling == NULL) {
-		root->sibling = sibling;
-		return n;
-	} else {
-		return add_sibling(root->sibling, sibling, n+1);
-	}
-
 }
 
 int add_child (struct tree *root, struct tree *child) {
@@ -404,15 +382,9 @@ int add_child (struct tree *root, struct tree *child) {
 		return -1;
 	}
 	inc_refcount(child);
-	if (root->children == NULL) {
-		root->children = child;
-		root->width = 1;
-		return 1;
-	} else {
-		int n = add_sibling(root->children, child, 2);
-		root->width = n;
-		return n;
-	}
+	append(root->children, child);
+	root->width++;
+	return root->width;
 }
 
 void set_type (struct tree *root, data_type t) {
@@ -423,31 +395,15 @@ data_type get_type(struct tree *t) {
 	return t->type;
 }
 
-struct tree *get_ith_sibling(struct tree *root, int i) {
-	if (i == 0) {
-		return root;
-	}
-
-	if (root == NULL) {
-		return NULL;
-	}
-
-	if (root->sibling == NULL) {
-		return NULL;
-	}
-
-	return get_ith_sibling(root->sibling, i-1);
-}
-
 struct tree *get_branch_t(struct tree *root, struct tree *branch) {
 	struct tree *child;
 	inc_refcount(branch);
-	child = get_branch(root, branch->data.i);
+	child = (struct tree *)get_branch(root, branch->data.i);
 	dec_refcount(branch);
 	return child;
 }
 
 
 struct tree *get_branch(struct tree *root, int branch) {
-	return get_ith_sibling(root->children, branch);
+	return (struct tree *)get(root->children, branch);
 }

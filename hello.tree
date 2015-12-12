@@ -13,7 +13,7 @@ int a 0;
 
 string b ["this" "is" "a" "test"];
 
-print : b.3;
+print : [b.1 b.3];
 
 print : "\n";
 

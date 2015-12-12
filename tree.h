@@ -1,6 +1,8 @@
 #ifndef __TREE_H__
 #define __TREE_H__
 
+#include "ll.h"
+
 typedef enum {INT, CHAR, DOUBLE, BOOL, VOID, TREE} data_type;
 
 union data_u {
@@ -15,8 +17,7 @@ struct tree {
 	union data_u data;
 	int width;
 	int refcount;
-	struct tree *children;
-	struct tree *sibling;
+	struct List *children;
 };
 
 void print (struct tree *str);
