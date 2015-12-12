@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall
+CFLAGS = -Wall -g
 
 TARFILES = Makefile scanner.mll parser.mly ast.mli calc.ml
 

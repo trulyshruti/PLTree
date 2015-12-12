@@ -6,11 +6,12 @@
 
 void print(struct tree *str) {
 	int i = 0;
-	int len = str->width;
+	int len;
 
 	if (str == NULL)
 		return;
-	
+
+	len = str->width;
 	switch(str->type) {
 		case CHAR:
 			putchar(str->data.c);
@@ -383,7 +384,7 @@ int add_child (struct tree *root, struct tree *child) {
 	}
 	inc_refcount(child);
 	append(root->children, child);
-	root->width++;
+	root->width += 1;
 	return root->width;
 }
 

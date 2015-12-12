@@ -62,6 +62,7 @@ void append(struct List *list, void *data) {
 	if (curr == NULL) {
 		curr = malloc(sizeof(struct node));
 		curr->next = NULL;
+		curr->data = data;
 		list->head = curr;
 		list->tail = curr;
 	} else {
