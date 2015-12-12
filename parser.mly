@@ -2,7 +2,7 @@
 
 
 %token SEMI LPAREN RPAREN LBRACE RBRACE LBRACK RBRACK COMMA DOT COL
-%token PLUS MINUS TIMES DIVIDE ASSIGN
+%token PLUS MINUS TIMES DIVIDE ASSIGN ARROW
 %token EQ NEQ LT LEQ GT GEQ
 %token RETURN IF IFELSE FOR WHILE INT CHAR BOOL DOUBLE STRING VOID
 %token <string> INT_LITERAL
@@ -12,7 +12,7 @@
 %token <string> ID
 %token EOF
 
-%left DOT
+%left ARROW
 
 %left SEMI
 
@@ -29,6 +29,7 @@
 %left LT GT LEQ GEQ
 %left PLUS MINUS
 %left TIMES DIVIDE
+
 
 %start program
 %type < Ast.program> program
@@ -53,6 +54,7 @@ stmt_list:
 
 stmt:
 	WHILE LBRACK expr RBRACK stmt_list SEMI 	{While($3, Seq($5))}
+|	IF LBRACK expr RBRACK stmt_list SEMI		{If($3, Seq($5))}
 |	ID LBRACK stmt_list RBRACK			{FuncDec($1, Seq($3))}
 |	vtype ID expr SEMI 				{VarDec($2, $3)}
 |	ID ASSIGN expr SEMI				{Assn($1, $3)}
@@ -71,7 +73,7 @@ expr:
 |	CHAR_LITERAL					{Tree(ChrLit($1), [])}
 |	FLOAT_LITERAL					{Tree(FltLit($1), [])}
 |	STRING_LITERAL					{Tree(StrLit($1), [])}
-|	expr DOT expr					{GetBranch($1, $3)}
+|	expr ARROW expr					{GetBranch($1, $3)}
 |	ID						{Id($1)}
 |	expr EQ expr					{Eq($1, $3)}
 |	expr NEQ expr					{Neq($1, $3)}

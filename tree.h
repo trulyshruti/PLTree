@@ -30,6 +30,7 @@ struct tree* inc_refcount(struct tree *t);
 struct tree* dec_refcount(struct tree *t);
 
 int equal(struct tree *lhs, struct tree *rhs);
+int nequal(struct tree *lhs, struct tree *rhs);
 int lt(struct tree *lhs, struct tree *rhs);
 int gt(struct tree *lhs, struct tree *rhs);
 int lte(struct tree *lhs, struct tree *rhs);

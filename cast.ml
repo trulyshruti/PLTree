@@ -24,6 +24,7 @@ type expr =
 
 type stmt =
 	While of expr * stmt * stmt list
+|	If of expr * stmt * stmt list
 |	FuncDec of string * stmt * stmt list
 |	VarDec of string * expr
 |	Assn of string * expr
@@ -85,15 +86,15 @@ let rec gen_c_expr =
 				"\n" ^ string_tab (n+1) (gen_c_tree_list (n+1) children ^ "NULL)")
 | GetBranch(tree, expr) -> "get_branch_t(" ^ gen_c_expr n tree ^ ", " ^ gen_c_expr n expr ^ ")"
 |	Eq(v1, v2) -> ("equal(" ^ gen_c_expr n v1 ^ ", " ^ gen_c_expr n v2 ^ ")")
-|	Neq(v1, v2) -> ("not-equal(" ^ gen_c_expr n v1 ^ ", " ^ gen_c_expr n v2 ^ ")")
+|	Neq(v1, v2) -> ("nequal(" ^ gen_c_expr n v1 ^ ", " ^ gen_c_expr n v2 ^ ")")
 |	Lt(v1, v2) -> ("lt(" ^ gen_c_expr n v1 ^ ", " ^ gen_c_expr n v2 ^ ")")
-|	Leq(v1, v2) -> ("leq(" ^ gen_c_expr n v1 ^ ", " ^ gen_c_expr n v2 ^ ")")
+|	Leq(v1, v2) -> ("lte(" ^ gen_c_expr n v1 ^ ", " ^ gen_c_expr n v2 ^ ")")
 |	Gt(v1, v2) -> ("gt(" ^ gen_c_expr n v1 ^ ", " ^ gen_c_expr n v2 ^ ")")
-|	Geq(v1, v2) -> ("geq(" ^ gen_c_expr n v1 ^ ", " ^ gen_c_expr n v2 ^ ")")
+|	Geq(v1, v2) -> ("gte(" ^ gen_c_expr n v1 ^ ", " ^ gen_c_expr n v2 ^ ")")
 |	Add(v1, v2) -> ("add(" ^ gen_c_expr n v1 ^ ", " ^ gen_c_expr n v2 ^ ")")
-|	Minus(v1, v2) -> ("minus(" ^ gen_c_expr n v1 ^ ", " ^ gen_c_expr n v2 ^ ")")
-|	Mul(v1, v2) -> ("multiply(" ^ gen_c_expr n v1 ^ ", " ^ gen_c_expr n v2 ^ ")")
-|	Div(v1, v2) -> ("divide(" ^ gen_c_expr n v1 ^ ", " ^ gen_c_expr n v2 ^ ")")
+|	Minus(v1, v2) -> ("sub(" ^ gen_c_expr n v1 ^ ", " ^ gen_c_expr n v2 ^ ")")
+|	Mul(v1, v2) -> ("mul(" ^ gen_c_expr n v1 ^ ", " ^ gen_c_expr n v2 ^ ")")
+|	Div(v1, v2) -> ("divd(" ^ gen_c_expr n v1 ^ ", " ^ gen_c_expr n v2 ^ ")")
 |	Id(v1) -> "" ^ v1
 |	IntLit(x) -> x
 |	ChrLit(x) -> x
@@ -103,6 +104,7 @@ let rec gen_c_expr =
 
 let rec gen_c = function n -> function
 	While(x, y, l) -> string_tab n ("while ("^(gen_c_expr n x) ^ ") { \n" ^ (gen_c (n+1) y) ^ "\n" ^  string_tab n "}")
+|	If(x, y, l) -> string_tab n ("if ("^(gen_c_expr n x) ^ ") { \n" ^ (gen_c (n+1) y) ^ "\n" ^  string_tab n "}")
 |	VarDec(v2, v3) -> string_tab n ("struct tree * " ^ v2 ^ " = " ^ gen_c_expr n v3 ^ "; inc_refcount(" ^ v2 ^ ");")
 |	FuncDec(str, stmt, l) -> str ^ "(){}" (* TODO *)
 |	Assn(v1, v2) -> string_tab n ("" ^ v1 ^ " = " ^ gen_c_expr n v2 ^ "; inc_refcount(" ^ v1 ^ ");")
@@ -146,6 +148,7 @@ let rec eval_expr = function n ->
 
 let rec eval = function n -> function
 	While(x, y, l) -> string_tab n ("While("^(eval_expr n x) ^ ",\n" ^ (eval (n+1) y) ^ "\n" ^  string_tab n ")")
+|	If(x, y, l) -> string_tab n ("If("^(eval_expr n x) ^ ",\n" ^ (eval (n+1) y) ^ "\n" ^  string_tab n ")")
 |	VarDec(v2, v3) -> string_tab n ("VarDec(" ^ v2 ^ ", " ^ eval_expr n v3 ^ ")")
 |	FuncDec(str, stmt, l) -> "" (* TODO *)
 |	Assn(v1, v2) -> string_tab n ("Assn(" ^ v1 ^ ", " ^ eval_expr n v2 ^ ")")

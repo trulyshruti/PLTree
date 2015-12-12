@@ -24,6 +24,7 @@ type expr =
 
 type stmt =
 	While of expr * stmt * stmt list
+|	If of expr * stmt * stmt list
 |	FuncDec of string * stmt * stmt list
 |	VarDec of string * expr
 |	Assn of string * expr
@@ -42,6 +43,8 @@ let rec get_funcs_list = function
 	| hd::tl -> match hd with FuncDec(_,Seq(l),_) -> List.concat
 		[ get_funcs_list l; hd::get_funcs_list tl ]
 		| While(_,Seq(l),_) -> List.concat
+		[get_funcs_list l; get_funcs_list tl ]
+		| If(_,Seq(l),_) -> List.concat
 		[get_funcs_list l; get_funcs_list tl ]
 		|_ -> get_funcs_list tl
 
@@ -76,6 +79,7 @@ let rec string_of_expr = function
 
 let rec string_of_stmt = function
 	While(e,s,l) -> string_of_expr e ^ " " ^ string_of_stmt s
+| If(e,s,l) -> string_of_expr e ^ " " ^ string_of_stmt s
 | FuncDec(str,stmt,l) -> str
 | VarDec(s,e) -> s ^ " " ^ string_of_expr e
 | Assn(s,e) -> s ^ " = " ^ string_of_expr e

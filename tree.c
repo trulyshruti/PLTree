@@ -64,6 +64,10 @@ int equal(struct tree *lhs, struct tree *rhs) {
 	dec_refcount(lhs);
 	return retval;
 }
+
+int nequal(struct tree *lhs, struct tree *rhs) {
+	return !equal(lhs, rhs);
+}
 int lt(struct tree *lhs, struct tree *rhs) {
 	int retval;
 	inc_refcount(lhs);

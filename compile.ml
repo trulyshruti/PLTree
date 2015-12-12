@@ -55,7 +55,7 @@ let translate prog =
 	| GetBranch(e1,e2) ->
 		let (se2,st) = expr env e2 in (match st with Sast.Int ->
 			let (se1,t) = expr env e1 in Sast.GetBranch(se1,se2), t
-	 | _ -> raise(Failure("Can only access branches with a number"))) (* TODO maybe bool/char? *)
+		| _ -> raise(Failure("Can only access branches with an int"))) (* TODO maybe bool/char? *)
 	| Void -> Sast.Void, Sast.Int (* TODO what type to return *)
 	| FunCall(s,e) -> if StringMap.mem s env.functions then
 	let (e,t) = expr env e in Sast.FunCall(s,e), t
@@ -104,6 +104,12 @@ let translate prog =
 		let (_,s) = transform_stmt env seq in let vars = get_vars_list s in
 		Sast.While(e,s,vars)
 		else raise(Failure("While predicates must be of type bool"))
+	| If(e,seq) -> env, let (e,t) = expr env e in
+		if t = Sast.Bool then let locs = merge_maps env.locals env.globals in
+		let env = {env with globals=locs; locals=StringMap.empty} in
+		let (_,s) = transform_stmt env seq in let vars = get_vars_list s in
+		Sast.If(e,s,vars)
+		else raise(Failure("If predicates must be of type bool"))
 	| FuncDec(s,seq) -> env, let locs = merge_maps env.locals env.globals in
 		let env = {env with globals=locs; locals=StringMap.empty} in
 		let (_,seq) = transform_stmt env seq in let vars = get_vars_list seq in

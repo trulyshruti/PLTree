@@ -22,6 +22,7 @@ rule token = parse
 | "<="    		{ LEQ }
 | ">"     		{ GT }
 | ">="    		{ GEQ }
+| "->"			{ ARROW }
 | ":"			{ COL }
 | ";"			{ SEMI }
 | "if"     		{ IF }

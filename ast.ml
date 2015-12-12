@@ -24,6 +24,7 @@ type expr =
 
 type stmt =
 	While of expr * stmt
+|	If of expr * stmt
 |	FuncDec of string * stmt
 |	VarDec of string * expr
 |	Assn of string * expr
@@ -64,6 +65,7 @@ let rec string_of_expr = function
 (* mixing c-like and pltree-like syntax. not on purpose *)
 let rec string_of_stmt = function
 	While(e,s) -> "While(" ^ string_of_expr e ^ ") {" ^ string_of_stmt s ^ "}"
+| If(e,s) -> "If(" ^ string_of_expr e ^ ") {" ^ string_of_stmt s ^ "}"
 | FuncDec(s,l) -> s ^ "[" ^ string_of_stmt l ^ "]"
 | VarDec(s,e) -> s ^ " = " ^ string_of_expr e
 | Assn(s,e) -> s ^ " = " ^ string_of_expr e

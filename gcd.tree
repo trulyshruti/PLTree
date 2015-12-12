@@ -1,0 +1,21 @@
+int a 21;
+int b 14;
+
+int c 0;
+
+while [b != 0]
+	int agtb 0;
+
+	if [a>b]
+		agtb = 1;
+	;
+
+	if [agtb == 1]
+		a = a - b;
+	;
+	if [agtb == 0]
+		b = b - a;
+	;
+;
+
+print:[a "\n"];

@@ -30,6 +30,8 @@ let transform prog =
 	let rec stmt = function
 	While(e,s,l) -> let l = List.map (fun e -> stmt e) l in
 	Cast.While(expr e, stmt s, l)
+	| If(e,s,l) -> let l = List.map (fun e -> stmt e) l in
+	Cast.If(expr e, stmt s, l)
 	| FuncDec(s,seq,l) -> let l = List.map (fun e -> stmt e) l in
 	Cast.FuncDec(s, stmt seq, l)
 	| VarDec(s,e) -> Cast.VarDec(s,expr e)
