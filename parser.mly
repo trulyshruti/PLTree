@@ -12,6 +12,8 @@
 %token <string> ID
 %token EOF
 
+%left DOT
+
 %left SEMI
 
 %right COL
@@ -74,11 +76,11 @@ expr:
 |	expr EQ expr					{Eq($1, $3)}
 |	expr NEQ expr					{Neq($1, $3)}
 |	expr LT expr					{Lt($1, $3)}
-| expr LEQ expr					{Leq($1, $3)}
-| expr GT expr					{Gt($1, $3)}
-| expr GEQ expr					{Geq($1, $3)}
+| 	expr LEQ expr					{Leq($1, $3)}
+| 	expr GT expr					{Gt($1, $3)}
+| 	expr GEQ expr					{Geq($1, $3)}
 |	expr PLUS expr					{Add($1, $3)}
-| expr MINUS expr					{Minus($1, $3)}
-| expr TIMES expr					{Mul($1, $3)}
-| expr DIVIDE expr				{Div($1, $3)}
+| 	expr MINUS expr					{Minus($1, $3)}
+| 	expr TIMES expr					{Mul($1, $3)}
+| 	expr DIVIDE expr				{Div($1, $3)}
 |	LPAREN expr RPAREN				{$2}
