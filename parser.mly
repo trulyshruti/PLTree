@@ -2,7 +2,7 @@
 
 
 %token SEMI LPAREN RPAREN LBRACE RBRACE LBRACK RBRACK COMMA DOT COL
-%token PLUS MINUS TIMES DIVIDE ASSIGN ARROW
+%token PLUS MINUS TIMES DIVIDE MOD ASSIGN ARROW
 %token EQ NEQ LT LEQ GT GEQ
 %token RETURN IF IFELSE FOR WHILE INT CHAR BOOL DOUBLE STRING VOID
 %token <string> INT_LITERAL
@@ -26,7 +26,7 @@
 %nonassoc ELSE
 %right ASSIGN
 %left EQ NEQ
-%left LT GT LEQ GEQ
+%left LT GT LEQ GEQ MOD
 %left PLUS MINUS
 %left TIMES DIVIDE
 
@@ -59,6 +59,7 @@ stmt:
 |	vtype ID expr SEMI 				{VarDec($2, $3)}
 |	ID ASSIGN expr SEMI				{Assn($1, $3)}
 |	expr SEMI					{Expr($1)}
+|	RETURN COL expr	SEMI				{Return($3)}
 |	LPAREN stmt RPAREN				{$2}
 
 expr_list:
@@ -85,4 +86,5 @@ expr:
 | 	expr MINUS expr					{Minus($1, $3)}
 | 	expr TIMES expr					{Mul($1, $3)}
 | 	expr DIVIDE expr				{Div($1, $3)}
+|	expr MOD expr					{Mod($1, $3)}
 |	LPAREN expr RPAREN				{$2}

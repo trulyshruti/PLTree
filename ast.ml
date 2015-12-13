@@ -20,6 +20,7 @@ type expr =
 |	Minus of expr * expr
 |	Mul of expr * expr
 |	Div of expr * expr
+|	Mod of expr * expr
 |	Id of string
 
 type stmt =
@@ -29,6 +30,7 @@ type stmt =
 |	VarDec of string * expr
 |	Assn of string * expr
 |	Expr of expr
+|	Return of expr
 |	Seq of stmt list
 
 type program = stmt list
@@ -60,6 +62,7 @@ let rec string_of_expr = function
 | Minus(e1, e2) -> string_of_expr e1 ^ "-" ^ string_of_expr e2
 | Mul(e1, e2) -> string_of_expr e1 ^ "*" ^ string_of_expr e2
 | Div(e1, e2) -> string_of_expr e1 ^ "/" ^ string_of_expr e2
+| Mod(e1, e2) -> string_of_expr e1 ^ "%" ^ string_of_expr e2
 | Id(s) -> s
 
 (* mixing c-like and pltree-like syntax. not on purpose *)
@@ -70,6 +73,7 @@ let rec string_of_stmt = function
 | VarDec(s,e) -> s ^ " = " ^ string_of_expr e
 | Assn(s,e) -> s ^ " = " ^ string_of_expr e
 | Expr(e) -> string_of_expr e
+| Return(e) -> "Return(" ^ string_of_expr e ^ ")"
 | Seq(l) ->  String.concat ", " (List.map string_of_stmt l)
 
 let string_of_program stmts =

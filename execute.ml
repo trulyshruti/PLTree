@@ -25,6 +25,7 @@ let transform prog =
 	| Minus(e1,e2) -> Cast.Minus(expr e1,expr e2)
 	| Mul(e1,e2) -> Cast.Mul(expr e1,expr e2)
 	| Div(e1,e2) -> Cast.Div(expr e1,expr e2)
+	| Mod(e1,e2) -> Cast.Mod(expr e1,expr e2)
 	| Id(s) -> Cast.Id(s) in
 
 	let rec stmt = function
@@ -37,6 +38,7 @@ let transform prog =
 	| VarDec(s,e) -> Cast.VarDec(s,expr e)
 	| Assn(s,e) -> Cast.Assn(s,expr e)
 	| Expr(e) -> Cast.Expr(expr e)
+	| Return(e) -> Cast.Return(expr e)
 	| Seq(l) -> let l = List.map (fun s -> stmt s) l in
 	Cast.Seq(l) in
 
@@ -49,6 +51,7 @@ let transform prog =
 
 (* Use the string_of funcs in cast.ml to make C file *)
 let execute_prog prog = let pe = transform prog in
-	print_endline ((*"Vars: " ^ Cast.gen_c_prog pe.variables ^
-	"\n\nFuncs: " ^ Cast.gen_c_prog pe.functions ^ "\n\nEverything: " ^ *)
-	Cast.string_of_program pe.all_statements)
+	print_endline ((*("Vars: " ^ Cast.gen_c_prog pe.variables ^*)
+		Cast.headers ^ "\n" ^
+		Cast.gen_c_funcs pe.functions ^
+		Cast.string_of_program pe.all_statements)

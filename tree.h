@@ -39,8 +39,8 @@ int gte(struct tree *lhs, struct tree *rhs);
 struct tree *sub(struct tree *lhs, struct tree *rhs);
 struct tree *add(struct tree *lhs, struct tree *rhs);
 struct tree *mult(struct tree *lhs, struct tree *rhs);
-
-
+struct tree *divd(struct tree *lhs, struct tree *rhs);
+struct tree *mod(struct tree *lhs, struct tree *rhs);
 
 struct tree *int_treemake(int i_data, struct tree *child, ...);
 struct tree *char_treemake(char c_data, struct tree *child, ...);

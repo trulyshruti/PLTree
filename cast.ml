@@ -20,6 +20,7 @@ type expr =
 |	Minus of expr * expr
 |	Mul of expr * expr
 |	Div of expr * expr
+|	Mod of expr * expr
 |	Id of string
 
 type stmt =
@@ -29,6 +30,7 @@ type stmt =
 |	VarDec of string * expr
 |	Assn of string * expr
 |	Expr of expr
+|	Return of expr
 |	Seq of stmt list
 
 type program = stmt list
@@ -95,6 +97,7 @@ let rec gen_c_expr =
 |	Minus(v1, v2) -> ("sub(" ^ gen_c_expr n v1 ^ ", " ^ gen_c_expr n v2 ^ ")")
 |	Mul(v1, v2) -> ("mul(" ^ gen_c_expr n v1 ^ ", " ^ gen_c_expr n v2 ^ ")")
 |	Div(v1, v2) -> ("divd(" ^ gen_c_expr n v1 ^ ", " ^ gen_c_expr n v2 ^ ")")
+|	Mod(v1, v2) -> ("mod(" ^ gen_c_expr n v1 ^ ", " ^ gen_c_expr n v2 ^ ")")
 |	Id(v1) -> "" ^ v1
 |	IntLit(x) -> x
 |	ChrLit(x) -> x
@@ -106,9 +109,10 @@ let rec gen_c = function n -> function
 	While(x, y, l) -> string_tab n ("while ("^(gen_c_expr n x) ^ ") { \n" ^ (gen_c (n+1) y) ^ "\n" ^  string_tab n "}")
 |	If(x, y, l) -> string_tab n ("if ("^(gen_c_expr n x) ^ ") { \n" ^ (gen_c (n+1) y) ^ "\n" ^  string_tab n "}")
 |	VarDec(v2, v3) -> string_tab n ("struct tree * " ^ v2 ^ " = " ^ gen_c_expr n v3 ^ "; inc_refcount(" ^ v2 ^ ");")
-|	FuncDec(str, stmt, l) -> str ^ "(){}" (* TODO *)
+|	FuncDec(str, stmt, l) -> "" (*str ^ "(){\n" ^ gen_c (n + 1) stmt ^ "} " *)
 |	Assn(v1, v2) -> string_tab n ("" ^ v1 ^ " = " ^ gen_c_expr n v2 ^ "; inc_refcount(" ^ v1 ^ ");")
 |	Expr(v1) -> string_tab n (gen_c_expr n v1)
+|	Return(v1) -> string_tab n ("return " ^ gen_c_expr n v1 ^ ";")
 |	Seq(v1) -> let rec gen_c_seq = function
 				hd::tl -> gen_c n hd ^ ";\n" ^ gen_c_seq tl
 			|	[] -> "" in
@@ -139,6 +143,7 @@ let rec eval_expr = function n ->
 |	Minus(v1, v2) -> ("Minus(" ^ eval_expr n v1 ^ ", " ^ eval_expr n v2 ^ ")")
 |	Mul(v1, v2) -> ("Mul(" ^ eval_expr n v1 ^ ", " ^ eval_expr n v2 ^ ")")
 |	Div(v1, v2) -> ("Div(" ^ eval_expr n v1 ^ ", " ^ eval_expr n v2 ^ ")")
+|	Mod(v1, v2) -> ("Mod(" ^ eval_expr n v1 ^ ", " ^ eval_expr n v2 ^ ")")
 |	Id(v1) -> "Id(" ^ v1 ^ ")"
 |	IntLit(x) -> x
 |	ChrLit(x) -> x
@@ -153,6 +158,7 @@ let rec eval = function n -> function
 |	FuncDec(str, stmt, l) -> "" (* TODO *)
 |	Assn(v1, v2) -> string_tab n ("Assn(" ^ v1 ^ ", " ^ eval_expr n v2 ^ ")")
 |	Expr(v1) -> string_tab n (eval_expr n v1)
+|	Return(v1) -> string_tab n ("Return(" ^ eval_expr n v1 ^ ")")
 |	Seq(v1) -> let rec eval_seq = function
 				hd::tl -> eval n hd ^ "\n" ^ eval_seq tl
 			|	[] -> "" in
@@ -161,12 +167,21 @@ let rec eval_prog = function
 	hd::tl -> "" ^ eval 0 hd ^ "\n" ^ eval_prog tl
 |	[] -> ""
 
+
 let rec gen_c_prog = function
 	hd::tl -> "" ^ gen_c 1 hd ^ ";\n" ^ gen_c_prog tl
 |	[] -> ""
 
+
+let rec gen_c_funcs = function
+	FuncDec(str, stmt, l)::tl -> "struct tree *" ^ str ^ "(struct tree *args){\n" ^ gen_c 1 stmt ^ "}\n" ^ gen_c_funcs tl
+|	_::tl -> gen_c_funcs tl
+|	[] -> ""
+
+let headers = 
+	"#include <stdio.h>\n#include <stdlib.h>\n#include \"tree.h\"\n"
+
 let string_of_program stmts =
-	"#include <stdio.h>\n#include <stdlib.h>\n#include \"tree.h\"\n" ^
 	"int main(int argc, char **argv) {\n" ^
 	gen_c_prog stmts ^
 	"\treturn 0;\n}"

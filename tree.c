@@ -129,7 +129,6 @@ int lte(struct tree *lhs, struct tree *rhs) {
 int gte(struct tree *lhs, struct tree *rhs) {
 	return lt(rhs, lhs);
 }
-
 void dec_refcount_child(void *child) {
 	dec_refcount((struct tree *)child);
 }
@@ -288,6 +287,32 @@ struct tree *divd(struct tree *lhs, struct tree *rhs) {
 	return retval;
 }
 
+struct tree *mod(struct tree *lhs, struct tree *rhs) {
+	struct tree *retval;
+
+	inc_refcount(lhs);
+	inc_refcount(rhs);
+
+	if (lhs->type != rhs->type) {
+		retval = NULL;
+	} else {
+		switch (lhs->type) {
+			case CHAR:
+				retval = char_treemake(lhs->data.c % rhs->data.c, NULL);
+				break;
+			case INT:
+				retval =  int_treemake(lhs->data.i % rhs->data.i, NULL);
+				break;
+			default:	
+				retval =  NULL;
+		}
+	}
+
+	dec_refcount(rhs);
+	dec_refcount(lhs);
+
+	return retval;
+}
 void init_tree(struct tree *root) {
 	root->children = malloc(sizeof(struct List));
 	root->type = VOID;

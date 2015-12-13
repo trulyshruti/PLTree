@@ -91,6 +91,10 @@ let translate prog =
 	if t1 = t2 then match t1 with Sast.Int | Sast.Double -> Sast.Div(e1,e2), t1
 		| _ -> raise(Failure("Divison operands must be of type int or double"))
 	else raise (Failure("Different types"))
+	| Mod(e1, e2) -> let (e1,t1) = expr env e1 in let (e2,t2) = expr env e2 in
+	if t1 = t2 then match t1 with Sast.Int | Sast.Double -> Sast.Mod(e1,e2), t1
+		| _ -> raise(Failure("Mod operands must be of type int or double"))
+	else raise (Failure("Different types"))
 	| Id(s) -> if StringMap.mem s env.locals then let (e1, e2) = StringMap.find s env.locals in (Sast.Id(s), e2)
 	else if StringMap.mem s env.globals then let (e1, e2) = StringMap.find s env.globals in (Sast.Id(s), e2)
 	else raise(Failure(s ^ " does not exist or is not visible")) in
@@ -110,11 +114,11 @@ let translate prog =
 		let (_,s) = transform_stmt env seq in let vars = get_vars_list s in
 		Sast.If(e,s,vars)
 		else raise(Failure("If predicates must be of type bool"))
-	| FuncDec(s,seq) -> env, let locs = merge_maps env.locals env.globals in
+	| FuncDec(s,seq) -> let locs = merge_maps env.locals env.globals in
 		let env = {env with globals=locs; locals=StringMap.empty} in
 		let (_,seq) = transform_stmt env seq in let vars = get_vars_list seq in
-		Sast.FuncDec(s,seq,vars) (* TODO *)
-
+		let funcs = StringMap.add s "" env.functions in 
+		{env with functions=funcs}, Sast.FuncDec(s,seq,vars) (* TODO *)
 	| VarDec(s,e) -> if StringMap.mem s env.locals then
 	raise (Failure (s ^ " is already declared")) else let (r,t) = expr env e in
 	let locs = StringMap.add s (r,t) env.locals in {env with locals=locs},
@@ -130,6 +134,7 @@ let translate prog =
 		", not " ^ Sast.string_of_vtype t))
 
 	| Expr(e) -> env, let (e,_) = expr env e in Sast.Expr(e)
+	| Return(e) -> env, let (e,_) = expr env e in Sast.Return(e)
 	| Seq(l) -> let (env,l) = map_stmts env l in env, Sast.Seq(List.rev l) and
 
 	(* environment -> Ast.stmt list -> (environment, Sast.stmt list) *)

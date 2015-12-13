@@ -1,0 +1,5 @@
+ret_test [
+	return:"Hello, World!\n";
+]
+
+print:ret_test:[];
