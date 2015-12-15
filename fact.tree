@@ -1,8 +1,9 @@
-fact : int a [
-	if [a->0 == 0]
+fact : any a [
+	int n a->0;
+	if : n == 0 [
 		return:1;
-	;
-	return: a->0 * fact:[a->0 - 1];
+	]
+	return: n * fact:[n - 1];
 ]
 
 

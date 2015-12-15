@@ -26,6 +26,7 @@ let avt_to_svt = function
 |	Ast.Void -> Sast.Void
 |	Ast.Any	-> Sast.Any
 |	Ast.Bool -> Sast.Bool
+let matching t1 t2 = t1 == t2 || t1 == Sast.Any || t2 == Sast.Any
 let translate prog =
 	let rec add_all m = function
 		[] -> m
@@ -66,44 +67,49 @@ let translate prog =
 	| Void -> Sast.Void, Sast.Void
 	| FunCall(s,e) -> if StringMap.mem s env.functions then
 	let vt = StringMap.find s env.functions in
-	let (e,t) = expr env e in if (vt == Sast.Any || t == vt) then Sast.FunCall(s,e), t
-	else raise(Failure(s ^ " expects an argument of type " ^ Sast.string_of_vtype vt ^ ", not " ^ Sast.string_of_vtype t))
+	let (e,t) = expr env e in if (vt == Sast.Any || t == vt) then Sast.FunCall(s,e), Sast.Any
+	else raise(Failure(s ^ " expects an argument of type " ^ 
+		Sast.string_of_vtype vt ^ ", not " ^ Sast.string_of_vtype t))
 	else raise(Failure(s ^ " does not exist or is not visible"))
-
 	| Eq(e1, e2) -> let (e1,t1) = expr env e1 in let (e2,t2) = expr env e2 in
-	if t1 = t2 then Sast.Eq(e1,e2), Sast.Bool else raise (Failure("Different types"))
+	if (matching t1 t2) then Sast.Eq(e1,e2), Sast.Bool else
+	let type_string = Sast.string_of_vtype t1 ^ " == " ^ Sast.string_of_vtype t2 in
+	raise (Failure("Different types: " ^ type_string))
 	| Neq(e1, e2) -> let (e1,t1) = expr env e1 in let (e2,t2) = expr env e2 in
-	if t1 = t2 then Sast.Neq(e1,e2), Sast.Bool else 
+	if (matching t1 t2) then Sast.Neq(e1,e2), Sast.Bool else 
 	let type_string = Sast.string_of_vtype t1 ^ " != " ^ Sast.string_of_vtype t2 in
 	raise (Failure("Different types: " ^ type_string))
 	| Lt(e1, e2) -> let (e1,t1) = expr env e1 in let (e2,t2) = expr env e2 in
-	if t1 = t2 then Sast.Lt(e1,e2), Sast.Bool else raise (Failure("Different types"))
+	if (matching t1 t2) then Sast.Lt(e1,e2), Sast.Bool else raise (Failure("Different types"))
 	| Leq(e1, e2) -> let (e1,t1) = expr env e1 in let (e2,t2) = expr env e2 in
-	if t1 = t2 then Sast.Leq(e1,e2), Sast.Bool else raise (Failure("Different types"))
+	if (matching t1 t2) then Sast.Leq(e1,e2), Sast.Bool else raise (Failure("Different types"))
 	| Gt(e1, e2) -> let (e1,t1) = expr env e1 in let (e2,t2) = expr env e2 in
-	if t1 = t2 then Sast.Gt(e1,e2), Sast.Bool else raise (Failure("Different types"))
+	if (matching t1 t2) then Sast.Gt(e1,e2), Sast.Bool else raise (Failure("Different types"))
 	| Geq(e1, e2) -> let (e1,t1) = expr env e1 in let (e2,t2) = expr env e2 in
-	if t1 = t2 then Sast.Geq(e1,e2), Sast.Bool else raise (Failure("Different types"))
+	if (matching t1 t2) then Sast.Geq(e1,e2), Sast.Bool else raise (Failure("Different types"))
 
 	(* Allow arithmetic on chars? *)
 	| Add(e1, e2) -> let (e1,t1) = expr env e1 in let (e2,t2) = expr env e2 in
-	if t1 = t2 then match t1 with Sast.Int | Sast.Double -> Sast.Add(e1,e2), t1
+	if (matching t1 t2) then match t1 with Sast.Int | Sast.Any | Sast.Double -> Sast.Add(e1,e2), t1
 		| _ -> raise(Failure("Addition operands must be of type int or double"))
-	else raise (Failure("Different types"))
+	else let type_string = Sast.string_of_vtype t1 ^ " + " ^ Sast.string_of_vtype t2 in
+	raise (Failure("Different types: " ^ type_string))
 	| Minus(e1, e2) -> let (e1,t1) = expr env e1 in let (e2,t2) = expr env e2 in
-	if t1 = t2 then match t1 with Sast.Int | Sast.Double -> Sast.Minus(e1,e2), t1
+	if (matching t1 t2) then match t1 with Sast.Int | Sast.Any | Sast.Double -> Sast.Minus(e1,e2), t1
 		| _ -> raise(Failure("Subtraction operands must be of type int or double"))
-	else raise (Failure("Different types"))
+	else let type_string = Sast.string_of_vtype t1 ^ " - " ^ Sast.string_of_vtype t2 in
+	raise (Failure("Different types: " ^ type_string))
 	| Mul(e1, e2) -> let (e1,t1) = expr env e1 in let (e2,t2) = expr env e2 in
-	if t1 = t2 then match t1 with Sast.Int | Sast.Double -> Sast.Mul(e1,e2), t1
+	if (matching t1 t2) then match t1 with Sast.Int | Sast.Any | Sast.Double -> Sast.Mul(e1,e2), t1
 		| _ -> raise(Failure("Multiplication operands must be of type int or double"))
-	else raise (Failure("Different types"))
+	else let type_string = Sast.string_of_vtype t1 ^ " * " ^ Sast.string_of_vtype t2 in
+	raise (Failure("Different types: " ^ type_string))
 	| Div(e1, e2) -> let (e1,t1) = expr env e1 in let (e2,t2) = expr env e2 in
-	if t1 = t2 then match t1 with Sast.Int | Sast.Double -> Sast.Div(e1,e2), t1
+	if (matching t1 t2) then match t1 with Sast.Int | Sast.Any | Sast.Double -> Sast.Div(e1,e2), t1
 		| _ -> raise(Failure("Divison operands must be of type int or double"))
 	else raise (Failure("Different types"))
 	| Mod(e1, e2) -> let (e1,t1) = expr env e1 in let (e2,t2) = expr env e2 in
-	if t1 = t2 then match t1 with Sast.Int | Sast.Double -> Sast.Mod(e1,e2), t1
+	if (matching t1 t2) then match t1 with Sast.Int | Sast.Any | Sast.Double -> Sast.Mod(e1,e2), t1
 		| _ -> raise(Failure("Mod operands must be of type int or double"))
 	else raise (Failure("Different types"))
 	| Cast(vt, e) -> let (e,_) = expr env e in let vt = avt_to_svt vt in
