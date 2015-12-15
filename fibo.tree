@@ -10,4 +10,4 @@ fibo : int n [
 ]
 
 
-print:[fibo:10 "\n"];
+print:[fibo:11 "\n"];

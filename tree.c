@@ -317,6 +317,7 @@ void init_tree(struct tree *root) {
 	root->children = malloc(sizeof(struct List));
 	root->type = VOID;
 	root->width = 0;
+	root->refcount = 0;
 	init_list(root->children);
 }
 
