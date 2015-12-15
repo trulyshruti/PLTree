@@ -15,10 +15,11 @@
 
 %left SEMI
 
-%right COL
 
 %left RPAREN
 %right LPAREN
+
+
 
 
 %nonassoc NOELSE
@@ -28,6 +29,8 @@
 %left LT GT LEQ GEQ MOD
 %left PLUS MINUS
 %left TIMES DIVIDE
+
+%right COL
 
 %left ARROW
 

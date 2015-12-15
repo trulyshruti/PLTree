@@ -1,0 +1,13 @@
+fibo : int n [
+	if [n->0 == 1]
+		return:1;
+	;
+	if [n->0 == 0]
+		return:1;
+	;
+
+	return:(fibo:[n->0 - 1] + fibo:[n->0 - 2]);
+]
+
+
+print:[fibo:[10] "\n"];
