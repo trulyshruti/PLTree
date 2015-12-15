@@ -3,7 +3,7 @@ open Ast
 module StringMap = Map.Make(String)
 
 type env = {
-	functions: string StringMap.t; (* Can this just be a list? *)
+	functions: Sast.vtype StringMap.t;
 	globals: (Sast.expr * Sast.vtype) StringMap.t;
 	locals: (Sast.expr * Sast.vtype) StringMap.t;
 	statements: string StringMap.t;
@@ -22,8 +22,8 @@ let print_maps env =
 let translate prog =
 	let rec add_all m = function
 		[] -> m
-		| hd::tl -> add_all (StringMap.add hd "" m) tl in
-	let builtins = add_all StringMap.empty ["print"] in
+		| (name,vtype)::tl -> add_all (StringMap.add name vtype m) tl in
+	let builtins = add_all StringMap.empty [("print",Sast.String)] in
 
 	let empty_env = {
 		functions = builtins;
@@ -55,10 +55,12 @@ let translate prog =
 	| GetBranch(e1,e2) ->
 		let (se2,st) = expr env e2 in (match st with Sast.Int ->
 			let (se1,t) = expr env e1 in Sast.GetBranch(se1,se2), t
-		| _ -> raise(Failure("Can only access branches with an int"))) (* TODO maybe bool/char? *)
-	| Void -> Sast.Void, Sast.Int (* TODO what type to return *)
+		| _ -> raise(Failure("Can only access branches with an int")))
+	| Void -> Sast.Void, Sast.Void
 	| FunCall(s,e) -> if StringMap.mem s env.functions then
-	let (e,t) = expr env e in Sast.FunCall(s,e), t
+	let vt = StringMap.find s env.functions in
+	let (e,t) = expr env e in if t == vt then Sast.FunCall(s,e), t
+	else raise(Failure(s ^ " expects an argument of type " ^ Sast.string_of_vtype vt ^ ", not " ^ Sast.string_of_vtype t))
 	else raise(Failure(s ^ " does not exist or is not visible"))
 
 	| Eq(e1, e2) -> let (e1,t1) = expr env e1 in let (e2,t2) = expr env e2 in
@@ -95,8 +97,10 @@ let translate prog =
 	if t1 = t2 then match t1 with Sast.Int | Sast.Double -> Sast.Mod(e1,e2), t1
 		| _ -> raise(Failure("Mod operands must be of type int or double"))
 	else raise (Failure("Different types"))
-	| Id(s) -> if StringMap.mem s env.locals then let (e1, e2) = StringMap.find s env.locals in (Sast.Id(s), e2)
-	else if StringMap.mem s env.globals then let (e1, e2) = StringMap.find s env.globals in (Sast.Id(s), e2)
+	| Id(s) -> if StringMap.mem s env.locals then
+		let (e1, e2) = StringMap.find s env.locals in (Sast.Id(s), e2)
+	else if StringMap.mem s env.globals then
+		let (e1, e2) = StringMap.find s env.globals in (Sast.Id(s), e2)
 	else raise(Failure(s ^ " does not exist or is not visible")) in
 
 	(* environment -> Ast.stmt -> (environment, Sast.stmt) *)
@@ -118,12 +122,13 @@ let translate prog =
 						Int -> Sast.IntLit("0"), Sast.Int
 					|	Char -> Sast.ChrLit("0"), Sast.Char
 					|	Double -> Sast.FltLit("0.0"), Sast.Double
-					|	String -> Sast.StrLit("0"), Sast.String ) in
+					|	String -> Sast.StrLit("0"), Sast.String
+					| Void -> Sast.Void, Sast.Void ) in
 		let locs = StringMap.add vn sexp StringMap.empty in
-		let funcs = StringMap.add s "" env.functions in 
+		let svt (_, vt) = vt in
+		let funcs = StringMap.add s (svt sexp) env.functions in
 		let env = {env with globals=StringMap.empty; locals=locs; functions=funcs} in
 		let (_,seq) = transform_stmt env seq in let vars = get_vars_list seq in
-		let svt (_, vt) = vt in
 		{env with functions=funcs}, Sast.FuncDec(s, (svt sexp), vn, seq,vars) (* TODO *)
 	| VarDec(s,e) -> if StringMap.mem s env.locals then
 	raise (Failure (s ^ " is already declared")) else let (r,t) = expr env e in

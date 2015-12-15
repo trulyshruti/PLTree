@@ -1,5 +1,5 @@
 type vtype =
-	Int | Char | Double | Bool | String
+	Int | Char | Double | Bool | String | Void
 
 type expr =
 	Tree of expr * expr list
@@ -56,6 +56,7 @@ let string_of_vtype = function
 | Double -> "double"
 | Bool -> "bool"
 | String -> "string"
+| Void -> "void"
 
 let rec string_of_expr = function
 	Tree(e,l) -> string_of_expr e ^ if List.length l > 0 then" {{ " ^
