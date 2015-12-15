@@ -49,6 +49,7 @@ vtype:
 |	DOUBLE		{Double}
 |	BOOL		{Bool}
 |	STRING		{String}
+|	VOID		{Void}
 
 
 stmt_list:

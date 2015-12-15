@@ -1,5 +1,5 @@
 type vtype =
-	Int | Char | Double | Bool | String
+	Int | Char | Double | Bool | String | Void
 
 type expr =
 	Tree of expr * expr list
@@ -179,7 +179,7 @@ let rec gen_c_funcs = function
 |	_::tl -> gen_c_funcs tl
 |	[] -> ""
 
-let headers = 
+let headers =
 	"#include <stdio.h>\n#include <stdlib.h>\n#include \"tree.h\"\n"
 
 let string_of_program stmts =

@@ -39,7 +39,8 @@ let transform prog =
 	|	Sast.Char -> Cast.Char
 	|	Sast.Double -> Cast.Double
 	|	Sast.Bool -> Cast.Bool
-	|	Sast.String -> Cast.String) in
+	|	Sast.String -> Cast.String
+	| Sast.Void -> Cast.Void ) in
 	Cast.FuncDec(s, (c_vtype vt), vn, stmt seq, l)
 	| VarDec(s,e) -> Cast.VarDec(s,expr e)
 	| Assn(s,e) -> Cast.Assn(s,expr e)

@@ -55,8 +55,8 @@ let translate prog =
 	| GetBranch(e1,e2) ->
 		let (se2,st) = expr env e2 in (match st with Sast.Int ->
 			let (se1,t) = expr env e1 in Sast.GetBranch(se1,se2), t
-		| _ -> raise(Failure("Can only access branches with an int"))) (* TODO maybe bool/char? *)
-	| Void -> Sast.Void, Sast.Int (* TODO what type to return *)
+		| _ -> raise(Failure("Can only access branches with an int")))
+	| Void -> Sast.Void, Sast.Void
 	| FunCall(s,e) -> if StringMap.mem s env.functions then
 	let (e,t) = expr env e in Sast.FunCall(s,e), t
 	else raise(Failure(s ^ " does not exist or is not visible"))
@@ -95,8 +95,10 @@ let translate prog =
 	if t1 = t2 then match t1 with Sast.Int | Sast.Double -> Sast.Mod(e1,e2), t1
 		| _ -> raise(Failure("Mod operands must be of type int or double"))
 	else raise (Failure("Different types"))
-	| Id(s) -> if StringMap.mem s env.locals then let (e1, e2) = StringMap.find s env.locals in (Sast.Id(s), e2)
-	else if StringMap.mem s env.globals then let (e1, e2) = StringMap.find s env.globals in (Sast.Id(s), e2)
+	| Id(s) -> if StringMap.mem s env.locals then
+		let (e1, e2) = StringMap.find s env.locals in (Sast.Id(s), e2)
+	else if StringMap.mem s env.globals then
+		let (e1, e2) = StringMap.find s env.globals in (Sast.Id(s), e2)
 	else raise(Failure(s ^ " does not exist or is not visible")) in
 
 	(* environment -> Ast.stmt -> (environment, Sast.stmt) *)
@@ -118,9 +120,10 @@ let translate prog =
 						Int -> Sast.IntLit("0"), Sast.Int
 					|	Char -> Sast.ChrLit("0"), Sast.Char
 					|	Double -> Sast.FltLit("0.0"), Sast.Double
-					|	String -> Sast.StrLit("0"), Sast.String ) in
+					|	String -> Sast.StrLit("0"), Sast.String
+					| Void -> Sast.Void, Sast.Void ) in
 		let locs = StringMap.add vn sexp StringMap.empty in
-		let funcs = StringMap.add s "" env.functions in 
+		let funcs = StringMap.add s "" env.functions in
 		let env = {env with globals=StringMap.empty; locals=locs; functions=funcs} in
 		let (_,seq) = transform_stmt env seq in let vars = get_vars_list seq in
 		let svt (_, vt) = vt in
