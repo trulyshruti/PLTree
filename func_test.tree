@@ -1,5 +1,5 @@
 
-print_test : string s [
+print_test : any s [
 	print:s;
 	return:[];
 ]
