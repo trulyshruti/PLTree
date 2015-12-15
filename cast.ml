@@ -21,6 +21,7 @@ type expr =
 |	Mul of expr * expr
 |	Div of expr * expr
 |	Mod of expr * expr
+|	Cast of vtype * expr
 |	Id of string
 
 type stmt =
@@ -35,6 +36,15 @@ type stmt =
 |	Seq of stmt list
 
 type program = stmt list
+
+let string_of_vtype = function
+	Int -> "int"
+| Char -> "char"
+| Double -> "double"
+| Bool -> "bool"
+| String -> "string"
+| Void -> "void"
+| Any -> "any"
 
 let rec string_tab n v = if n == 0 then v else string_tab (n-1) ("\t" ^ v)
 
@@ -99,6 +109,7 @@ let rec gen_c_expr =
 |	Mul(v1, v2) -> ("mult(" ^ gen_c_expr n v1 ^ ", " ^ gen_c_expr n v2 ^ ")")
 |	Div(v1, v2) -> ("divd(" ^ gen_c_expr n v1 ^ ", " ^ gen_c_expr n v2 ^ ")")
 |	Mod(v1, v2) -> ("mod(" ^ gen_c_expr n v1 ^ ", " ^ gen_c_expr n v2 ^ ")")
+|	Cast(vt,e) -> ("cast(" ^ string_of_vtype vt ^ ", " ^ gen_c_expr n e ^ ")")
 |	Id(v1) -> "" ^ v1
 |	IntLit(x) -> x
 |	ChrLit(x) -> x
@@ -148,6 +159,7 @@ let rec eval_expr = function n ->
 |	Mul(v1, v2) -> ("Mul(" ^ eval_expr n v1 ^ ", " ^ eval_expr n v2 ^ ")")
 |	Div(v1, v2) -> ("Div(" ^ eval_expr n v1 ^ ", " ^ eval_expr n v2 ^ ")")
 |	Mod(v1, v2) -> ("Mod(" ^ eval_expr n v1 ^ ", " ^ eval_expr n v2 ^ ")")
+|	Cast(vt,e) -> ("Cast(" ^ string_of_vtype vt ^ ", " ^ eval_expr n e ^ ")")
 |	Id(v1) -> "Id(" ^ v1 ^ ")"
 |	IntLit(x) -> x
 |	ChrLit(x) -> x

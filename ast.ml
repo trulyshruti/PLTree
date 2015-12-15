@@ -21,6 +21,7 @@ type expr =
 |	Mul of expr * expr
 |	Div of expr * expr
 |	Mod of expr * expr
+|	Cast of vtype * expr
 |	Id of string
 
 type stmt =
@@ -66,6 +67,7 @@ let rec string_of_expr = function
 | Mul(e1, e2) -> string_of_expr e1 ^ "*" ^ string_of_expr e2
 | Div(e1, e2) -> string_of_expr e1 ^ "/" ^ string_of_expr e2
 | Mod(e1, e2) -> string_of_expr e1 ^ "%" ^ string_of_expr e2
+| Cast(vt,e) -> string_of_vtype vt ^ " to " ^ string_of_expr e
 | Id(s) -> s
 
 (* mixing c-like and pltree-like syntax. not on purpose *)

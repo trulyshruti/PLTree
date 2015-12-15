@@ -106,6 +106,8 @@ let translate prog =
 	if t1 = t2 then match t1 with Sast.Int | Sast.Double -> Sast.Mod(e1,e2), t1
 		| _ -> raise(Failure("Mod operands must be of type int or double"))
 	else raise (Failure("Different types"))
+	| Cast(vt, e) -> let (e,_) = expr env e in let vt = avt_to_svt vt in
+	Sast.Cast(vt, e), vt
 	| Id(s) -> if StringMap.mem s env.locals then
 		let (e1, e2) = StringMap.find s env.locals in (Sast.Id(s), e2)
 	else if StringMap.mem s env.globals then
