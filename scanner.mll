@@ -27,7 +27,7 @@ rule token = parse
 | ":"			{ COL }
 | ";"			{ SEMI }
 | "if"     		{ IF }
-| "ifelse" 		{ IFELSE }
+| "else" 		{ ELSE }
 | "while"  		{ WHILE }
 | "return" 		{ RETURN }
 | "int" 	   	{ INT }

@@ -4,7 +4,7 @@
 %token SEMI LPAREN RPAREN LBRACE RBRACE LBRACK RBRACK COMMA DOT COL
 %token PLUS MINUS TIMES DIVIDE MOD ASSIGN ARROW
 %token EQ NEQ LT LEQ GT GEQ
-%token RETURN IF IFELSE FOR WHILE INT CHAR BOOL DOUBLE STRING VOID ANY
+%token RETURN IF ELSE FOR WHILE INT CHAR BOOL DOUBLE STRING VOID ANY
 %token <string> INT_LITERAL
 %token <string> CHAR_LITERAL
 %token <string> FLOAT_LITERAL
@@ -58,10 +58,11 @@ stmt_list:
 |	stmt stmt_list 	{$1 :: $2}
 
 stmt:
-	WHILE LBRACK expr RBRACK stmt_list SEMI 	{While($3, Seq($5))}
-|	IF LBRACK expr RBRACK stmt_list SEMI		{If($3, Seq($5))}
+	WHILE COL expr LBRACK stmt_list RBRACK	 	{While($3, Seq($5))}
+|	IF COL expr LBRACK stmt_list RBRACK		{If($3, Seq($5))}
+|	IF COL expr LBRACK stmt_list RBRACK ELSE LBRACK stmt_list RBRACK {IfElse($3, Seq($5), Seq($9))}
 |	ID COL vtype ID LBRACK stmt_list RBRACK		{FuncDec($1, $3, $4, Seq($6))}
-|	vtype ID expr SEMI 				{VarDec($2, $3)}
+|	vtype ID expr SEMI 				{VarDec($1, $2, $3)}
 |	ID ASSIGN expr SEMI				{Assn($1, $3)}
 |	expr SEMI					{Expr($1)}
 |	RETURN COL expr	SEMI				{Return($3)}

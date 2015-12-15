@@ -5,6 +5,14 @@ type prog_els = { variables: Cast.stmt list;
 	all_statements: Cast.stmt list; }
 
 (* turns S-ast to C-ast*)
+let c_vtype = function s_vt -> (match s_vt with
+	Sast.Int -> Cast.Int
+|	Sast.Char -> Cast.Char
+|	Sast.Double -> Cast.Double
+|	Sast.Bool -> Cast.Bool
+|	Sast.String -> Cast.String
+|	Sast.Any -> Cast.Any
+|	Sast.Void -> Cast.Void )
 let transform prog =
 	let rec expr = function
 	Tree(e,l) -> let l = List.map (fun e -> expr e) l in Cast.Tree(expr e,l)
@@ -33,17 +41,11 @@ let transform prog =
 	Cast.While(expr e, stmt s, l)
 	| If(e,s,l) -> let l = List.map (fun e -> stmt e) l in
 	Cast.If(expr e, stmt s, l)
+	| IfElse(e,s,s2,l) -> let l = List.map (fun e -> stmt e) l in
+	Cast.IfElse(expr e, stmt s, stmt s2, l)
 	| FuncDec(s, vt, vn, seq,l) -> let l = List.map (fun e -> stmt e) l in
-	let c_vtype = function s_vt -> (match s_vt with
-		Sast.Int -> Cast.Int
-	|	Sast.Char -> Cast.Char
-	|	Sast.Double -> Cast.Double
-	|	Sast.Bool -> Cast.Bool
-	|	Sast.String -> Cast.String
-	|	Sast.Any -> Cast.Any
-	| Sast.Void -> Cast.Void ) in
 	Cast.FuncDec(s, (c_vtype vt), vn, stmt seq, l)
-	| VarDec(s,e) -> Cast.VarDec(s,expr e)
+	| VarDec(t,s,e) -> Cast.VarDec((c_vtype t),s,expr e)
 	| Assn(s,e) -> Cast.Assn(s,expr e)
 	| Expr(e) -> Cast.Expr(expr e)
 	| Return(e) -> Cast.Return(expr e)

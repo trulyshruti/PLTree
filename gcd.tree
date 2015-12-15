@@ -1,12 +1,12 @@
-gcd : int args [
+gcd : any args [
 	int a args->0;
 	int b args->1;
 	int c 0;
-	while [a != 0]
+	while : a != 0 [
 		c = a;
 		a = b%a;
 		b = c;
-	;
+	]
 	return:b;
 ]
 

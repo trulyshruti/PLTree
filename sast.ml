@@ -26,8 +26,9 @@ type expr =
 type stmt =
 	While of expr * stmt * stmt list
 |	If of expr * stmt * stmt list
+|	IfElse of expr * stmt * stmt * stmt list
 |	FuncDec of string * vtype * string * stmt * stmt list
-|	VarDec of string * expr
+|	VarDec of vtype * string * expr
 |	Assn of string * expr
 |	Expr of expr
 |	Return of expr
@@ -37,7 +38,7 @@ type program = stmt list
 
 let rec get_vars_list = function
 	[] -> []
-	| hd::tl -> match hd with VarDec(_,_) -> hd::get_vars_list tl
+	| hd::tl -> match hd with VarDec(_,_,_) -> hd::get_vars_list tl
 		| _ -> get_vars_list tl
 
 let rec get_funcs_list = function
@@ -48,6 +49,8 @@ let rec get_funcs_list = function
 		[get_funcs_list l; get_funcs_list tl ]
 		| If(_,Seq(l),_) -> List.concat
 		[get_funcs_list l; get_funcs_list tl ]
+		| IfElse(_,Seq(l),Seq(l2),_) -> List.concat
+		[get_funcs_list l; get_funcs_list l2; get_funcs_list tl ]
 		|_ -> get_funcs_list tl
 
 let string_of_vtype = function
@@ -85,8 +88,9 @@ let rec string_of_expr = function
 let rec string_of_stmt = function
 	While(e,s,l) -> string_of_expr e ^ " " ^ string_of_stmt s
 | If(e,s,l) -> string_of_expr e ^ " " ^ string_of_stmt s
+| IfElse(e,s,s2,l) -> string_of_expr e ^ " " ^ string_of_stmt s ^ " " ^ string_of_stmt s2
 | FuncDec(str,vt,vn,stmt,l) -> str ^ "[ " ^ string_of_stmt stmt ^ "] "
-| VarDec(s,e) -> s ^ " " ^ string_of_expr e
+| VarDec(t,s,e) -> s ^ " " ^ string_of_expr e
 | Assn(s,e) -> s ^ " = " ^ string_of_expr e
 | Expr(e) -> string_of_expr e
 | Return(e) -> "return:(" ^ string_of_expr e ^ ")";

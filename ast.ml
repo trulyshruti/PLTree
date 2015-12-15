@@ -26,8 +26,9 @@ type expr =
 type stmt =
 	While of expr * stmt
 |	If of expr * stmt
+|	IfElse of expr * stmt * stmt
 |	FuncDec of string * vtype * string * stmt
-|	VarDec of string * expr
+|	VarDec of vtype * string * expr
 |	Assn of string * expr
 |	Expr of expr
 |	Return of expr
@@ -71,8 +72,9 @@ let rec string_of_expr = function
 let rec string_of_stmt = function
 	While(e,s) -> "While(" ^ string_of_expr e ^ ") {" ^ string_of_stmt s ^ "}"
 | If(e,s) -> "If(" ^ string_of_expr e ^ ") {" ^ string_of_stmt s ^ "}"
+| IfElse(e,s1,s2) -> "If(" ^ string_of_expr e ^ ") {" ^ string_of_stmt s1 ^ "} Else {" ^ string_of_stmt s2 ^ "}"
 | FuncDec(s,vt,vn,l) -> s ^ "[" ^ string_of_stmt l ^ "]"
-| VarDec(s,e) -> s ^ " = " ^ string_of_expr e
+| VarDec(v,s,e) -> s ^ " = " ^ string_of_expr e
 | Assn(s,e) -> s ^ " = " ^ string_of_expr e
 | Expr(e) -> string_of_expr e
 | Return(e) -> "Return(" ^ string_of_expr e ^ ")"
