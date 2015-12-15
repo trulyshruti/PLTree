@@ -1,28 +1,34 @@
-VarDec(str, Tree(Void, 
-	Tree('h', [])::
-	Tree('e', [])::
-	Tree('l', [])::
-	Tree('l', [])::
-	Tree('o', [])::
-	Tree('\n', [])::
-	[]))
-FunCall(print, 
-	Tree(Void, 
-		Tree('H', [])::
-		Tree('e', [])::
-		Tree('l', [])::
-		Tree('l', [])::
-		Tree('o', [])::
-		Tree(',', [])::
-		Tree(' ', [])::
-		Tree('W', [])::
-		Tree('o', [])::
-		Tree('r', [])::
-		Tree('l', [])::
-		Tree('d', [])::
-		Tree('!', [])::
-		Tree('\n', [])::
-		[]))
-FunCall(print, 
-	Id(str))
+#include <stdio.h>
+#include <stdlib.h>
+#include "tree.h"
 
+int main(int argc, char **argv) {
+	struct tree * str = void_treemake(
+		char_treemake('h', NULL), 
+		char_treemake('e', NULL), 
+		char_treemake('l', NULL), 
+		char_treemake('l', NULL), 
+		char_treemake('o', NULL), 
+		char_treemake('\n', NULL), 
+		NULL); inc_refcount(str);;
+	print(
+		void_treemake(
+			char_treemake('H', NULL), 
+			char_treemake('e', NULL), 
+			char_treemake('l', NULL), 
+			char_treemake('l', NULL), 
+			char_treemake('o', NULL), 
+			char_treemake(',', NULL), 
+			char_treemake(' ', NULL), 
+			char_treemake('W', NULL), 
+			char_treemake('o', NULL), 
+			char_treemake('r', NULL), 
+			char_treemake('l', NULL), 
+			char_treemake('d', NULL), 
+			char_treemake('!', NULL), 
+			char_treemake('\n', NULL), 
+			NULL));
+	print(
+		str);
+	return 0;
+}

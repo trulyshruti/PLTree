@@ -19,7 +19,7 @@ exp='_exp'
 outdict='tests/output_out/'
 expdict='tests/output_exp/'
 # define default option
-options='./calc'
+options='./pltree'
 
 # Make sure there's arguments
 if [ $# -eq 0 ]
@@ -32,7 +32,7 @@ make_calc() {
 	# run "make"; surpress output
 	make &> /dev/null
 	# double check that calc was created
-	if ! [ -a calc ]
+	if ! [ -a pltree ]
 	then
 		echo 'Invoke lexer/parser to produce calc file.'
 		exit 2;
@@ -49,7 +49,7 @@ while getopts ":c" opt; do
 			rundict='tests/output_run/'
 			out='_run'
 			exp='_res'
-			options='./calc -c'
+			options='./pltree -c'
 			make_calc
 			for arg
 			do

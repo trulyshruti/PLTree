@@ -4,7 +4,7 @@ CFLAGS = -Wall -g
 TARFILES = Makefile scanner.mll parser.mly ast.mli calc.ml
 
 OBJS = parser.cmo scanner.cmo calc.cmo
-ALLOBJS = ast.cmo cast.cmo sast.cmo parser.cmo scanner.cmo compile.cmo execute.cmo pltree.cmo
+ALLOBJS = ast.cmo cast.cmo stubs.cmo sast.cmo parser.cmo scanner.cmo compile.cmo execute.cmo pltree.cmo
 
 pltree: $(ALLOBJS)
 	ocamlc -o pltree $(ALLOBJS)
@@ -58,10 +58,12 @@ calc.cmo : scanner.cmo parser.cmi ast.cmo
 calc.cmx : scanner.cmx parser.cmx ast.cmx
 cast.cmo :
 cast.cmx :
+stubs.cmo :
+stubs.cmx :
 compile.cmo : sast.cmo ast.cmo
 compile.cmx : sast.cmx ast.cmx
-execute.cmo : sast.cmo cast.cmo
-execute.cmx : sast.cmx cast.cmx
+execute.cmo : sast.cmo cast.cmo stubs.cmo
+execute.cmx : sast.cmx cast.cmx stubs.cmx
 parser.cmo : ast.cmo parser.cmi
 parser.cmx : ast.cmx parser.cmi
 pltree.cmo : scanner.cmo parser.cmi execute.cmo compile.cmo ast.cmo

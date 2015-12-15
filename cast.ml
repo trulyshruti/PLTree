@@ -187,7 +187,11 @@ let rec gen_c_funcs = function
 |	[] -> ""
 
 let headers =
-	"#include <stdio.h>\n#include <stdlib.h>\n#include \"tree.h\"\n"
+	"#include <stdio.h>\n#include <stdlib.h>\n" ^
+	"#include <stdio.h>\n" ^
+	"#include <stdlib.h>\n" ^
+	"#include <string.h>\n" ^
+	"#include <stdarg.h>\n"
 
 let string_of_program stmts =
 	"int main(int argc, char **argv) {\n" ^

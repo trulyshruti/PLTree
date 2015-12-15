@@ -63,5 +63,7 @@ let transform prog =
 let execute_prog prog = let pe = transform prog in
 	print_endline ((*("Vars: " ^ Cast.gen_c_prog pe.variables ^*)
 		Cast.headers ^ "\n" ^
+		Stubs.ll_c ^ "\n" ^
+		Stubs.tree_c ^ "\n" ^
 		Cast.gen_c_funcs pe.functions ^
 		Cast.string_of_program pe.all_statements)
