@@ -34,6 +34,7 @@ let transform prog =
 	| Mul(e1,e2) -> Cast.Mul(expr e1,expr e2)
 	| Div(e1,e2) -> Cast.Div(expr e1,expr e2)
 	| Mod(e1,e2) -> Cast.Mod(expr e1,expr e2)
+	| Cast(t,e) -> Cast.Cast(c_vtype t, expr e)
 	| Id(s) -> Cast.Id(s) in
 
 	let rec stmt = function
