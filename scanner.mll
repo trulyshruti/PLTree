@@ -36,6 +36,7 @@ rule token = parse
 | "void"   		{ VOID }
 | "double" 		{ DOUBLE }
 | "string"		{ STRING }
+| "any"			{ ANY }
 | "'"[^'\n']"'" as lxm	{ CHAR_LITERAL(lxm) }
 | "'\\n'" 	as lxm 	{ CHAR_LITERAL(lxm) }
 | '-'?['0'-'9']+ as lxm 	{ INT_LITERAL(lxm) }

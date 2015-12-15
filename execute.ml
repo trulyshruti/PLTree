@@ -40,6 +40,7 @@ let transform prog =
 	|	Sast.Double -> Cast.Double
 	|	Sast.Bool -> Cast.Bool
 	|	Sast.String -> Cast.String
+	|	Sast.Any -> Cast.Any
 	| Sast.Void -> Cast.Void ) in
 	Cast.FuncDec(s, (c_vtype vt), vn, stmt seq, l)
 	| VarDec(s,e) -> Cast.VarDec(s,expr e)

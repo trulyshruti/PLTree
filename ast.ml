@@ -1,5 +1,5 @@
 type vtype =
-	Int | Char | Double | Bool | String | Void
+	Int | Char | Double | Bool | String | Void | Any
 
 type expr =
 	Tree of expr * expr list
@@ -42,6 +42,7 @@ let string_of_vtype = function
 | Bool -> "bool"
 | String -> "string"
 | Void -> "void"
+| Any -> "any"
 
 let rec string_of_expr = function
 	Tree(e,l) -> string_of_expr e ^ " {{ " ^

@@ -23,7 +23,7 @@ let translate prog =
 	let rec add_all m = function
 		[] -> m
 		| (name,vtype)::tl -> add_all (StringMap.add name vtype m) tl in
-	let builtins = add_all StringMap.empty [("print",Sast.String)] in
+	let builtins = add_all StringMap.empty [("print",Sast.Any)] in
 
 	let empty_env = {
 		functions = builtins;
@@ -59,7 +59,7 @@ let translate prog =
 	| Void -> Sast.Void, Sast.Void
 	| FunCall(s,e) -> if StringMap.mem s env.functions then
 	let vt = StringMap.find s env.functions in
-	let (e,t) = expr env e in if t == vt then Sast.FunCall(s,e), t
+	let (e,t) = expr env e in if (vt == Sast.Any || t == vt) then Sast.FunCall(s,e), t
 	else raise(Failure(s ^ " expects an argument of type " ^ Sast.string_of_vtype vt ^ ", not " ^ Sast.string_of_vtype t))
 	else raise(Failure(s ^ " does not exist or is not visible"))
 
@@ -123,6 +123,7 @@ let translate prog =
 					|	Char -> Sast.ChrLit("0"), Sast.Char
 					|	Double -> Sast.FltLit("0.0"), Sast.Double
 					|	String -> Sast.StrLit("0"), Sast.String
+					|	Any -> Sast.IntLit("0"), Sast.Any
 					| Void -> Sast.Void, Sast.Void ) in
 		let locs = StringMap.add vn sexp StringMap.empty in
 		let svt (_, vt) = vt in

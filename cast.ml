@@ -1,5 +1,5 @@
 type vtype =
-	Int | Char | Double | Bool | String | Void
+	Int | Char | Double | Bool | String | Void | Any
 
 type expr =
 	Tree of expr * expr list
