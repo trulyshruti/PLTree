@@ -1,5 +1,12 @@
-ret_test [
-	return:"Hello, World!\n";
+
+print_test : string s [
+	print:s;
+	return:[];
 ]
 
-print:ret_test:[];
+ret_test : string s [
+	return:[s s];
+]
+
+
+print_test:ret_test:"Hi\n";

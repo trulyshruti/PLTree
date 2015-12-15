@@ -26,7 +26,7 @@ type expr =
 type stmt =
 	While of expr * stmt * stmt list
 |	If of expr * stmt * stmt list
-|	FuncDec of string * stmt * stmt list
+|	FuncDec of string * vtype * string * stmt * stmt list
 |	VarDec of string * expr
 |	Assn of string * expr
 |	Expr of expr
@@ -109,7 +109,7 @@ let rec gen_c = function n -> function
 	While(x, y, l) -> string_tab n ("while ("^(gen_c_expr n x) ^ ") { \n" ^ (gen_c (n+1) y) ^ "\n" ^  string_tab n "}")
 |	If(x, y, l) -> string_tab n ("if ("^(gen_c_expr n x) ^ ") { \n" ^ (gen_c (n+1) y) ^ "\n" ^  string_tab n "}")
 |	VarDec(v2, v3) -> string_tab n ("struct tree * " ^ v2 ^ " = " ^ gen_c_expr n v3 ^ "; inc_refcount(" ^ v2 ^ ");")
-|	FuncDec(str, stmt, l) -> "" (*str ^ "(){\n" ^ gen_c (n + 1) stmt ^ "} " *)
+|	FuncDec(str, vt, vn, stmt, l) -> "" (*str ^ "(){\n" ^ gen_c (n + 1) stmt ^ "} " *)
 |	Assn(v1, v2) -> string_tab n ("" ^ v1 ^ " = " ^ gen_c_expr n v2 ^ "; inc_refcount(" ^ v1 ^ ");")
 |	Expr(v1) -> string_tab n (gen_c_expr n v1)
 |	Return(v1) -> string_tab n ("return " ^ gen_c_expr n v1 ^ ";")
@@ -155,7 +155,7 @@ let rec eval = function n -> function
 	While(x, y, l) -> string_tab n ("While("^(eval_expr n x) ^ ",\n" ^ (eval (n+1) y) ^ "\n" ^  string_tab n ")")
 |	If(x, y, l) -> string_tab n ("If("^(eval_expr n x) ^ ",\n" ^ (eval (n+1) y) ^ "\n" ^  string_tab n ")")
 |	VarDec(v2, v3) -> string_tab n ("VarDec(" ^ v2 ^ ", " ^ eval_expr n v3 ^ ")")
-|	FuncDec(str, stmt, l) -> "" (* TODO *)
+|	FuncDec(str, vt, vn, stmt, l) -> "" (* TODO *)
 |	Assn(v1, v2) -> string_tab n ("Assn(" ^ v1 ^ ", " ^ eval_expr n v2 ^ ")")
 |	Expr(v1) -> string_tab n (eval_expr n v1)
 |	Return(v1) -> string_tab n ("Return(" ^ eval_expr n v1 ^ ")")
@@ -174,7 +174,8 @@ let rec gen_c_prog = function
 
 
 let rec gen_c_funcs = function
-	FuncDec(str, stmt, l)::tl -> "struct tree *" ^ str ^ "(struct tree *args){\n" ^ gen_c 1 stmt ^ "}\n" ^ gen_c_funcs tl
+	FuncDec(str, vt, vn, stmt, l)::tl -> "struct tree *" ^ str ^ "(struct tree *" ^ vn ^ "){" ^
+	"inc_refcount(" ^ vn ^ ");\n" ^ gen_c 1 stmt ^ "}\n" ^ gen_c_funcs tl
 |	_::tl -> gen_c_funcs tl
 |	[] -> ""
 

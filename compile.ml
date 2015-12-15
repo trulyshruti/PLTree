@@ -114,11 +114,17 @@ let translate prog =
 		let (_,s) = transform_stmt env seq in let vars = get_vars_list s in
 		Sast.If(e,s,vars)
 		else raise(Failure("If predicates must be of type bool"))
-	| FuncDec(s,seq) -> let locs = merge_maps env.locals env.globals in
-		let env = {env with globals=locs; locals=StringMap.empty} in
-		let (_,seq) = transform_stmt env seq in let vars = get_vars_list seq in
+	| FuncDec(s, vt, vn, seq) -> let sexp = (match vt with
+						Int -> Sast.IntLit("0"), Sast.Int
+					|	Char -> Sast.ChrLit("0"), Sast.Char
+					|	Double -> Sast.FltLit("0.0"), Sast.Double
+					|	String -> Sast.StrLit("0"), Sast.String ) in
+		let locs = StringMap.add vn sexp StringMap.empty in
 		let funcs = StringMap.add s "" env.functions in 
-		{env with functions=funcs}, Sast.FuncDec(s,seq,vars) (* TODO *)
+		let env = {env with globals=StringMap.empty; locals=locs; functions=funcs} in
+		let (_,seq) = transform_stmt env seq in let vars = get_vars_list seq in
+		let svt (_, vt) = vt in
+		{env with functions=funcs}, Sast.FuncDec(s, (svt sexp), vn, seq,vars) (* TODO *)
 	| VarDec(s,e) -> if StringMap.mem s env.locals then
 	raise (Failure (s ^ " is already declared")) else let (r,t) = expr env e in
 	let locs = StringMap.add s (r,t) env.locals in {env with locals=locs},

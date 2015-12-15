@@ -55,7 +55,7 @@ stmt_list:
 stmt:
 	WHILE LBRACK expr RBRACK stmt_list SEMI 	{While($3, Seq($5))}
 |	IF LBRACK expr RBRACK stmt_list SEMI		{If($3, Seq($5))}
-|	ID LBRACK stmt_list RBRACK			{FuncDec($1, Seq($3))}
+|	ID COL vtype ID LBRACK stmt_list RBRACK		{FuncDec($1, $3, $4, Seq($6))}
 |	vtype ID expr SEMI 				{VarDec($2, $3)}
 |	ID ASSIGN expr SEMI				{Assn($1, $3)}
 |	expr SEMI					{Expr($1)}

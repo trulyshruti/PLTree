@@ -33,8 +33,14 @@ let transform prog =
 	Cast.While(expr e, stmt s, l)
 	| If(e,s,l) -> let l = List.map (fun e -> stmt e) l in
 	Cast.If(expr e, stmt s, l)
-	| FuncDec(s,seq,l) -> let l = List.map (fun e -> stmt e) l in
-	Cast.FuncDec(s, stmt seq, l)
+	| FuncDec(s, vt, vn, seq,l) -> let l = List.map (fun e -> stmt e) l in
+	let c_vtype = function s_vt -> (match s_vt with
+		Sast.Int -> Cast.Int
+	|	Sast.Char -> Cast.Char
+	|	Sast.Double -> Cast.Double
+	|	Sast.Bool -> Cast.Bool
+	|	Sast.String -> Cast.String) in
+	Cast.FuncDec(s, (c_vtype vt), vn, stmt seq, l)
 	| VarDec(s,e) -> Cast.VarDec(s,expr e)
 	| Assn(s,e) -> Cast.Assn(s,expr e)
 	| Expr(e) -> Cast.Expr(expr e)
