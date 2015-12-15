@@ -12,7 +12,6 @@
 %token <string> ID
 %token EOF
 
-%left ARROW
 
 %left SEMI
 
@@ -30,6 +29,7 @@
 %left PLUS MINUS
 %left TIMES DIVIDE
 
+%left ARROW
 
 %start program
 %type < Ast.program> program

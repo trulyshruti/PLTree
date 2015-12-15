@@ -226,7 +226,7 @@ struct tree *add(struct tree *lhs, struct tree *rhs) {
 	return retval;
 }
 
-struct tree *mul(struct tree *lhs, struct tree *rhs) {
+struct tree *mult(struct tree *lhs, struct tree *rhs) {
 	struct tree *retval;
 
 	inc_refcount(lhs);

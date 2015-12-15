@@ -95,7 +95,7 @@ let rec gen_c_expr =
 |	Geq(v1, v2) -> ("gte(" ^ gen_c_expr n v1 ^ ", " ^ gen_c_expr n v2 ^ ")")
 |	Add(v1, v2) -> ("add(" ^ gen_c_expr n v1 ^ ", " ^ gen_c_expr n v2 ^ ")")
 |	Minus(v1, v2) -> ("sub(" ^ gen_c_expr n v1 ^ ", " ^ gen_c_expr n v2 ^ ")")
-|	Mul(v1, v2) -> ("mul(" ^ gen_c_expr n v1 ^ ", " ^ gen_c_expr n v2 ^ ")")
+|	Mul(v1, v2) -> ("mult(" ^ gen_c_expr n v1 ^ ", " ^ gen_c_expr n v2 ^ ")")
 |	Div(v1, v2) -> ("divd(" ^ gen_c_expr n v1 ^ ", " ^ gen_c_expr n v2 ^ ")")
 |	Mod(v1, v2) -> ("mod(" ^ gen_c_expr n v1 ^ ", " ^ gen_c_expr n v2 ^ ")")
 |	Id(v1) -> "" ^ v1
