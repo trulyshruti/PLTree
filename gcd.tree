@@ -10,4 +10,22 @@ gcd : any args [
 	return:b;
 ]
 
-print:[gcd:[21 14] "\n"];
+print:"Testing iterative gcd with 65 and 195\n";
+
+print:[gcd:[65 195] "\n"];
+
+
+gcdr : any args [
+	int a args->0;
+	int b args->1;
+
+	if : a == 0 [
+		return:b;
+	]
+
+	return:gcdr:[b%a a];
+]
+
+print:"Testing recursive gcd with 14 and 21\n";
+
+print:[gcdr:[14 21] "\n"];
