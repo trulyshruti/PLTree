@@ -11,13 +11,3 @@ gcd : int args [
 ]
 
 print:[gcd:[21 14] "\n"];
-
-
-fact : int args [
-	if [args == 0]
-		return:1;;
-	return:fact:args;
-]
-
-
-print:[fact:5];
