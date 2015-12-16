@@ -19,7 +19,8 @@
 %left RPAREN
 %right LPAREN
 
-
+%left RBRACE
+%left LBRACE
 
 
 %nonassoc NOELSE
@@ -78,9 +79,6 @@ expr:
 	ID COL expr					{FunCall($1, $3)}
 |	LBRACK expr_list RBRACK				{Tree(Void, $2)}
 |	LBRACE expr RBRACE LBRACK expr_list RBRACK	{Tree($2, $5)}
-|	LBRACE INT_LITERAL RBRACE LBRACK expr_list RBRACK	{Tree(IntLit($2), $5)}
-|	LBRACE FLOAT_LITERAL RBRACE LBRACK expr_list RBRACK	{Tree(FltLit($2), $5)}
-|	LBRACE CHAR_LITERAL RBRACE LBRACK expr_list RBRACK	{Tree(ChrLit($2), $5)}
 |	INT_LITERAL					{Tree(IntLit($1), [])}
 |	CHAR_LITERAL					{Tree(ChrLit($1), [])}
 |	FLOAT_LITERAL					{Tree(FltLit($1), [])}
