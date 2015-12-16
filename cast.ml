@@ -8,6 +8,7 @@ type expr =
 |	FltLit of string
 |	StrLit of string
 |	GetBranch of expr * expr
+|	GetWidth of expr
 |	Void
 |	FunCall of string * expr
 |	Eq of expr * expr
@@ -98,6 +99,7 @@ let rec gen_c_expr =
 			else
 				"\n" ^ string_tab (n+1) (gen_c_tree_list (n+1) children ^ "NULL)")
 | GetBranch(tree, expr) -> "get_branch_t(" ^ gen_c_expr n tree ^ ", " ^ gen_c_expr n expr ^ ")"
+|	GetWidth(tree) -> "get_width_t(" ^ gen_c_expr n tree ^ ")"
 |	Eq(v1, v2) -> ("equal(" ^ gen_c_expr n v1 ^ ", " ^ gen_c_expr n v2 ^ ")")
 |	Neq(v1, v2) -> ("nequal(" ^ gen_c_expr n v1 ^ ", " ^ gen_c_expr n v2 ^ ")")
 |	Lt(v1, v2) -> ("lt(" ^ gen_c_expr n v1 ^ ", " ^ gen_c_expr n v2 ^ ")")
@@ -148,6 +150,7 @@ let rec eval_expr = function n ->
 			else
 				", \n" ^ string_tab (n+1) (eval_tree_list (n+1) children ^ ")")
 |	GetBranch(tree, expr) -> "" (* TODO *)
+|	GetWidth(tree) -> ""
 |	Eq(v1, v2) -> ("Eq(" ^ eval_expr n v1 ^ ", " ^ eval_expr n v2 ^ ")")
 |	Neq(v1, v2) -> ("Neq(" ^ eval_expr n v1 ^ ", " ^ eval_expr n v2 ^ ")")
 |	Lt(v1, v2) -> ("Lt(" ^ eval_expr n v1 ^ ", " ^ eval_expr n v2 ^ ")")

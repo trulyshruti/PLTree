@@ -24,6 +24,7 @@ rule token = parse
 | ">"     		{ GT }
 | ">="    		{ GEQ }
 | "->"			{ ARROW }
+| "#"			{ POUND }
 | ":"			{ COL }
 | ";"			{ SEMI }
 | "if"     		{ IF }

@@ -21,6 +21,7 @@ let transform prog =
 	| FltLit(s) -> Cast.FltLit(s)
 	| StrLit(s) -> Cast.StrLit(s)
 	| GetBranch(e1,e2) -> Cast.GetBranch(expr e1, expr e2)
+	| GetWidth(e1) -> Cast.GetWidth(expr e1)
 	| Void -> Cast.Void
 	| FunCall(s,e) -> Cast.FunCall(s, expr e)
 	| Eq(e1,e2) -> Cast.Eq(expr e1,expr e2)

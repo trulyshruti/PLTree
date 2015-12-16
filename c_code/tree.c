@@ -35,6 +35,10 @@ void print(struct tree *str) {
 
 }
 
+struct tree *get_width_t(struct tree *t) {
+	return int_treemake(t->width, NULL);
+}
+
 
 int equal(struct tree *lhs, struct tree *rhs) {
 
@@ -146,7 +150,24 @@ void free_tree(struct tree *t) {
 	free(t);
 }
 
+struct tree *cast(data_type type, struct tree *t) {
+	if (type == INT) {
+		switch (t->type) {
+			case INT:
+				break;
+			case DOUBLE:
+				t->data.i = (int)t->data.d;
+				break;
+			case CHAR:
+				t->data.i = (int)t->data.c;
+				break;
+			default:
+				t->data.i = 0;
+		}
+		t->type = INT;
+				
 
+}
 
 struct tree* inc_refcount(struct tree *t) {
 	if (t) {

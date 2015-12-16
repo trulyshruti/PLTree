@@ -26,6 +26,10 @@ void init_tree (struct tree *root);
 
 void free_tree(struct tree *t);
 
+struct tree *get_width_t(struct tree *t) {
+
+struct tree* cast(data_type type, struct tree *t);
+
 struct tree* inc_refcount(struct tree *t);
 struct tree* dec_refcount(struct tree *t);
 

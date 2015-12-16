@@ -22,6 +22,7 @@ type expr =
 |	Div of expr * expr
 |	Mod of expr * expr
 |	Cast of vtype * expr
+|	GetWidth of expr
 |	Id of string
 
 type stmt =
@@ -54,6 +55,7 @@ let rec string_of_expr = function
 | FltLit(s) -> s
 | StrLit(s) -> s
 | GetBranch(e1,e2) -> string_of_expr e1 ^ "." ^ string_of_expr e2
+| GetWidth(e1) -> string_of_expr e1
 | Void -> "void"
 | FunCall(s,e) -> s ^ "(" ^ string_of_expr e ^ ")"
 | Eq(e1, e2) -> string_of_expr e1 ^ "==" ^ string_of_expr e2

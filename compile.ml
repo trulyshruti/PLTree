@@ -31,7 +31,7 @@ let translate prog =
 	let rec add_all m = function
 		[] -> m
 		| (name,vtype)::tl -> add_all (StringMap.add name vtype m) tl in
-	let builtins = add_all StringMap.empty [("print",Sast.Any)] in
+	let builtins = add_all StringMap.empty [("print",Sast.Any); ("put_t",Sast.Any)] in
 
 	let empty_env = {
 		functions = builtins;
@@ -64,6 +64,8 @@ let translate prog =
 		let (se2,st) = expr env e2 in (match st with Sast.Int ->
 			let (se1,t) = expr env e1 in Sast.GetBranch(se1,se2), t
 		| _ -> raise(Failure("Can only access branches with an int")))
+	| GetWidth(e1) ->
+		let (se1, st) = expr env e1 in Sast.GetWidth(se1), st
 	| Void -> Sast.Void, Sast.Void
 	| FunCall(s,e) -> if StringMap.mem s env.functions then
 	let vt = StringMap.find s env.functions in

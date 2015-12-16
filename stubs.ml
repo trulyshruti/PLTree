@@ -19,6 +19,10 @@ struct tree {
 
 void print (struct tree *str);
 
+void put_t (struct tree *t);
+
+struct tree *get_width_t(struct tree *t);
+
 void init_tree (struct tree *root);
 
 void free_tree(struct tree *t);
@@ -84,6 +88,27 @@ void print(struct tree *str) {
 		print(get_branch(str, i++));
 	}
 
+}
+
+void put_t(struct tree *str) {	
+
+	switch(str->type) {
+		case CHAR:
+			putchar(str->data.c);
+			break;
+		case INT:
+			printf(\"%d\", str->data.i);
+			break;
+		case DOUBLE:
+			printf(\"%f\", str->data.d);
+			break;
+		default:
+			break;
+	}
+}
+
+struct tree *get_width_t(struct tree *t) {
+	return int_treemake(t->width, NULL);
 }
 
 

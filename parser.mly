@@ -2,7 +2,7 @@
 
 
 %token SEMI LPAREN RPAREN LBRACE RBRACE LBRACK RBRACK COMMA DOT COL
-%token PLUS MINUS TIMES DIVIDE MOD ASSIGN ARROW
+%token PLUS MINUS TIMES DIVIDE MOD ASSIGN ARROW POUND
 %token EQ NEQ LT LEQ GT GEQ
 %token RETURN IF ELSE FOR WHILE INT CHAR BOOL DOUBLE STRING VOID ANY
 %token <string> INT_LITERAL
@@ -33,6 +33,8 @@
 %right COL
 
 %left ARROW
+
+%right POUND
 
 %start program
 %type < Ast.program> program
@@ -76,6 +78,9 @@ expr:
 	ID COL expr					{FunCall($1, $3)}
 |	LBRACK expr_list RBRACK				{Tree(Void, $2)}
 |	LBRACE expr RBRACE LBRACK expr_list RBRACK	{Tree($2, $5)}
+|	LBRACE INT_LITERAL RBRACE LBRACK expr_list RBRACK	{Tree(IntLit($2), $5)}
+|	LBRACE FLOAT_LITERAL RBRACE LBRACK expr_list RBRACK	{Tree(FltLit($2), $5)}
+|	LBRACE CHAR_LITERAL RBRACE LBRACK expr_list RBRACK	{Tree(ChrLit($2), $5)}
 |	INT_LITERAL					{Tree(IntLit($1), [])}
 |	CHAR_LITERAL					{Tree(ChrLit($1), [])}
 |	FLOAT_LITERAL					{Tree(FltLit($1), [])}
@@ -93,4 +98,5 @@ expr:
 | 	expr TIMES expr					{Mul($1, $3)}
 | 	expr DIVIDE expr				{Div($1, $3)}
 |	expr MOD expr					{Mod($1, $3)}
+|	POUND expr					{GetWidth($2)}
 |	LPAREN expr RPAREN				{$2}
