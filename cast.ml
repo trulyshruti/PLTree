@@ -1,5 +1,5 @@
 type vtype =
-	Int | Char | Double | Bool | String | Void | Any
+	Int | Char | Double | Bool | String | Any
 
 type expr =
 	Tree of expr * expr list
@@ -44,7 +44,6 @@ let string_of_vtype = function
 | Double -> "double"
 | Bool -> "bool"
 | String -> "string"
-| Void -> "void"
 | Any -> "any"
 
 let rec string_tab n v = if n == 0 then v else string_tab (n-1) ("\t" ^ v)

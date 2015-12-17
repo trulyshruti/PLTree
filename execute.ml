@@ -11,8 +11,7 @@ let c_vtype = function s_vt -> (match s_vt with
 |	Sast.Double -> Cast.Double
 |	Sast.Bool -> Cast.Bool
 |	Sast.String -> Cast.String
-|	Sast.Any -> Cast.Any
-|	Sast.Void -> Cast.Void )
+|	Sast.Any -> Cast.Any)
 let transform prog =
 	let rec expr = function
 	Tree(e,l) -> let l = List.map (fun e -> expr e) l in Cast.Tree(expr e,l)
