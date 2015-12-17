@@ -1,0 +1,12 @@
+$stdio.tree$
+print_test : any s [
+	print:s;
+	return:[];
+]
+
+ret_test : string s [
+	return:[s s];
+]
+
+
+print_test:ret_test:"Hi\n";

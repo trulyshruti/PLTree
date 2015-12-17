@@ -49,7 +49,7 @@ while getopts ":c" opt; do
 			rundict='tests/output_run/'
 			out='_run'
 			exp='_res'
-			options='./pltree -c'
+			options='./pltree'
 			make_calc
 			for arg
 			do
@@ -65,10 +65,9 @@ while getopts ":c" opt; do
 						exit 2;
 					else
 						# compile given file; save output
-						cat $arg | $options > "${outdict}${progname}.c"
-						gcc -Wall -c  "${outdict}${progname}.c" -o "${outdict}${progname}.o"
-						gcc -Wall -c tree.c -o "${outdict}tree.o"
-						gcc -Wall -o "${outdict}${progname}" "${outdict}${progname}.o" "${outdict}tree.o"
+						$options $arg "${outdict}${progname}.c"
+						gcc -Wall "${outdict}${progname}.c" -o "${outdict}${progname}"
+						rm -rf *.tmp
 						touch "${rundict}${progname}${out}"
 						"./${outdict}${progname}" > "${rundict}${progname}${out}"
 
@@ -94,10 +93,9 @@ while getopts ":c" opt; do
 							exit 2;
 						else
 							# compile given file; save output
-							cat $arg/$f | $options > "${outdict}${progname}.c"
-							gcc -Wall -c  "${outdict}${progname}.c" -o "${outdict}${progname}.o"
-							gcc -Wall -c tree.c -o "${outdict}tree.o"
-							gcc -Wall -o "${outdict}${progname}" "${outdict}${progname}.o" "${outdict}tree.o"
+							$options $arg/$f  "${outdict}${progname}.c"
+							gcc -Wall "${outdict}${progname}.c" -o "${outdict}${progname}"
+							rm -rf $arg/*.tmp
 							touch "${rundict}${progname}${out}"
 							"./${outdict}${progname}" > "${rundict}${progname}${out}"
 

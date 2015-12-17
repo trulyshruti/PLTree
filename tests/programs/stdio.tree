@@ -1,0 +1,16 @@
+print: any t [
+	any data t;
+	int n #data;
+	int i 0;
+
+	put_t:data;
+
+	i = 0;
+
+	while: i < n [
+		print:data->i;
+		i = i + 1;
+	]
+
+	return:[];
+]

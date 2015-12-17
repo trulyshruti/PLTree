@@ -1,6 +1,0 @@
-char str ['h' 'e' 'l' 'l' 'o' '\n'];
-
-print : "Hello, World!\n";
-
-print : str;
-

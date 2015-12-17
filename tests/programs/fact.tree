@@ -1,0 +1,12 @@
+$stdio.tree$
+
+fact : any a [
+	int n a->0;
+	if : n == 0 [
+		return:1;
+	]
+	return: n * fact:[n - 1];
+]
+
+
+print:[fact:[10] "\n"];
