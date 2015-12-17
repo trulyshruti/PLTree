@@ -1,4 +1,4 @@
-
+$stdio.tree$
 print_test : any s [
 	print:s;
 	return:[];

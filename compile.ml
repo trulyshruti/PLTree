@@ -151,6 +151,7 @@ let translate prog =
 					|	Double -> Sast.FltLit("0.0"), Sast.Double
 					|	String -> Sast.StrLit("0"), Sast.String
 					|	Any -> Sast.IntLit("0"), Sast.Any
+					|	Bool -> Sast.IntLit("0"), Sast.Any
 					| Void -> Sast.Void, Sast.Void ) in
 		let locs = StringMap.add vn sexp StringMap.empty in
 		let svt (_, vt) = vt in

@@ -1,3 +1,5 @@
+$stdio.tree$
+
 gcd : any args [
 	int a args->0;
 	int b args->1;

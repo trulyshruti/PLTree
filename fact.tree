@@ -1,3 +1,5 @@
+$stdio.tree$
+
 fact : any a [
 	int n a->0;
 	if : n == 0 [
