@@ -10,8 +10,7 @@ rule token = parse
 and  stringl buffer = parse
  | '"' { Buffer.contents buffer }
  | "\\t" { Buffer.add_char buffer '\t'; stringl buffer lexbuf }
- | "\\n" { Buffer.add_char buffer '\n'; stringl buffer lexbuf }
- | "\\n" { Buffer.add_char buffer '\n'; stringl buffer lexbuf }
+ | "\\n" { Buffer.add_char buffer '\\'; Buffer.add_char buffer 'n'; stringl buffer lexbuf }
  | '\\' '"' { Buffer.add_char buffer '"'; stringl buffer lexbuf }
  | '\\' '\\' { Buffer.add_char buffer '\\'; stringl buffer lexbuf }
  | eof { raise End_of_file }
