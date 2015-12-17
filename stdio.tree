@@ -1,5 +1,4 @@
-print: any t [
-	any data t;
+print: any data [
 	int n #data;
 	int i 0;
 
@@ -12,5 +11,5 @@ print: any t [
 		i = i + 1;
 	]
 
-	return:[];
+	return:data;
 ]
