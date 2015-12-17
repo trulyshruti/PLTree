@@ -62,8 +62,9 @@ let transform prog =
 	all_statements = List.map	(fun s -> stmt s) prog; }
 
 (* Use the string_of funcs in cast.ml to make C file *)
-let execute_prog prog = let pe = transform prog in
-	print_endline ((*("Vars: " ^ Cast.gen_c_prog pe.variables ^*)
+let execute_prog prog outfile = let pe = transform prog in
+	Printf.fprintf outfile "%s"
+	(
 		Cast.headers ^ "\n" ^
 		Stubs.ll_c ^ "\n" ^
 		Stubs.tree_c ^ "\n" ^

@@ -1,0 +1,5 @@
+print_test:any s [
+	print:[s "\n"];
+	return:[];
+]
+

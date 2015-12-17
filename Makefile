@@ -4,7 +4,8 @@ CFLAGS = -Wall -g
 TARFILES = Makefile scanner.mll parser.mly ast.mli calc.ml
 
 OBJS = parser.cmo scanner.cmo calc.cmo
-ALLOBJS = ast.cmo cast.cmo stubs.cmo sast.cmo parser.cmo scanner.cmo compile.cmo execute.cmo pltree.cmo
+ALLOBJS = ast.cmo cast.cmo stubs.cmo sast.cmo parser.cmo scanner.cmo compile.cmo execute.cmo \
+	iast.cmo iparser.cmo iscanner.cmo imports.cmo pltree.cmo
 
 pltree: $(ALLOBJS)
 	ocamlc -o pltree $(ALLOBJS)
@@ -17,6 +18,12 @@ scanner.ml : scanner.mll
 
 parser.ml parser.mli : parser.mly
 	ocamlyacc parser.mly
+
+iscanner.ml : iscanner.mll
+	ocamllex iscanner.mll
+
+iparser.ml iparser.mli : iparser.mly
+	ocamlyacc iparser.mly
 
 %.cmo : %.ml
 	ocamlc -c $<
@@ -46,7 +53,8 @@ calculator.tar.gz : $(TARFILES)
 .PHONY : clean
 clean :
 	rm -f calc pltree parser.ml parser.mli scanner.ml
-	rm -f *.cmo *.cmi *.o
+	rm -f iparser.ml iparser.mli iscanner.ml
+	rm -f *.cmo *.cmi *.o *.tmp
 	rm -f hello func_test gcd tree fact ll fibo pretty_tree
 	rm -f func_test.c hello.c gcd.c fact.c fibo.c pretty_tree.c
 	rm -f *.automaton *.conflicts
@@ -58,16 +66,22 @@ calc.cmo : scanner.cmo parser.cmi ast.cmo
 calc.cmx : scanner.cmx parser.cmx ast.cmx
 cast.cmo :
 cast.cmx :
-stubs.cmo :
-stubs.cmx :
 compile.cmo : sast.cmo ast.cmo
 compile.cmx : sast.cmx ast.cmx
-execute.cmo : sast.cmo cast.cmo stubs.cmo
-execute.cmx : sast.cmx cast.cmx stubs.cmx
+execute.cmo : stubs.cmo sast.cmo cast.cmo
+execute.cmx : stubs.cmx sast.cmx cast.cmx
+iast.cmo :
+iast.cmx :
+imports.cmo : iscanner.cmo iparser.cmi iast.cmo
+imports.cmx : iscanner.cmx iparser.cmx iast.cmx
+iparser.cmo : iast.cmo iparser.cmi
+iparser.cmx : iast.cmx iparser.cmi
+iscanner.cmo : iparser.cmi
+iscanner.cmx : iparser.cmx
 parser.cmo : ast.cmo parser.cmi
 parser.cmx : ast.cmx parser.cmi
-pltree.cmo : scanner.cmo parser.cmi execute.cmo compile.cmo ast.cmo
-pltree.cmx : scanner.cmx parser.cmx execute.cmx compile.cmx ast.cmx
+pltree.cmo : scanner.cmo parser.cmi imports.cmo execute.cmo compile.cmo
+pltree.cmx : scanner.cmx parser.cmx imports.cmx execute.cmx compile.cmx
 read.cmo : scanner.cmo parser.cmi ast.cmo
 read.cmx : scanner.cmx parser.cmx ast.cmx
 read_tree.cmo : scanner.cmo parser.cmi
@@ -76,4 +90,7 @@ sast.cmo :
 sast.cmx :
 scanner.cmo : parser.cmi
 scanner.cmx : parser.cmx
+stubs.cmo :
+stubs.cmx :
+iparser.cmi : iast.cmo
 parser.cmi : ast.cmo
