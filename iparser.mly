@@ -1,7 +1,6 @@
 %{ open Iast %}
 
 %token <string> OPEN
-%token <char> OTHER
 %token <string> STRING_LITERAL
 %token <char> CHAR_LITERAL
 %token EOF
