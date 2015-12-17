@@ -1,8 +1,12 @@
 open Printf
 
+let stdlibdir = "/usr/local/bin/pltree_std/"
 
 let rec lex_file filename outfile opened_list =
-  	let lexbuf = Lexing.from_channel (open_in filename) in
+  	let lexbuf = Lexing.from_channel (
+		try open_in filename with 
+			e -> open_in (Filename.concat stdlibdir filename)
+	) in
 	let program = Iparser.program Iscanner.token lexbuf in
 	let rec print_program = 
 		function outfile ->

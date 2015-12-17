@@ -50,6 +50,15 @@ menhir:
 calculator.tar.gz : $(TARFILES)
 	cd .. && tar zcf calculator/calculator.tar.gz $(TARFILES:%=calculator/%)
 
+
+/usr/local/bin/pltree_std/stdio.tree: 
+	mkdir /usr/local/bin/pltree_std
+	cp stdio.tree /usr/local/bin/pltree_std
+
+.PHONY: install
+install: pltree /usr/local/bin/pltree_std/stdio.tree
+	cp pltree /usr/local/bin
+
 .PHONY : clean
 clean :
 	rm -f calc pltree parser.ml parser.mli scanner.ml

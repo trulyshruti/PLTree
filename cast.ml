@@ -197,7 +197,7 @@ let rec gen_c_prog = function
 
 let rec gen_c_funcs = function
 	FuncDec(str, vt, vn, stmt, l)::tl -> "struct tree *" ^ str ^ "(struct tree *" ^ vn ^ "){" ^
-	"inc_refcount(" ^ vn ^ ");\n" ^ gen_c 1 stmt ^ "}\n" ^ gen_c_funcs tl
+	"inc_refcount(" ^ vn ^ ");\n" ^ gen_c 1 stmt ^ "return NULL;}\n" ^ gen_c_funcs tl
 |	_::tl -> gen_c_funcs tl
 |	[] -> ""
 
