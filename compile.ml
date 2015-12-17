@@ -31,7 +31,7 @@ let translate prog =
 	let rec add_all m = function
 		[] -> m
 		| (name,vtype)::tl -> add_all (StringMap.add name vtype m) tl in
-	let builtins = add_all StringMap.empty [("print",Sast.Any); ("put_t",Sast.Any)] in
+	let builtins = add_all StringMap.empty [("put_t",Sast.Any)] in
 
 	let empty_env = {
 		functions = builtins;

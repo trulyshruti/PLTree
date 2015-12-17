@@ -38,14 +38,14 @@ menhir:
 
 .SECONDARY:
 
-%: %.o tree.o ll.o
-	$(CC) $(CFLAGS) -o $@ $< tree.o ll.o
+%: %.o
+	$(CC) $(CFLAGS) -o $@ $<
 
 %.o: %.c %.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
 %.c: %.tree pltree
-	cat $< | ./pltree -c > $@
+	./pltree $< $@
 
 calculator.tar.gz : $(TARFILES)
 	cd .. && tar zcf calculator/calculator.tar.gz $(TARFILES:%=calculator/%)

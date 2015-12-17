@@ -17,8 +17,6 @@ struct tree {
 	struct List *children;
 };
 
-void print (struct tree *str);
-
 void put_t (struct tree *t);
 
 struct tree *get_width_t(struct tree *t);
@@ -59,37 +57,6 @@ struct tree *get_branch_t(struct tree *root, struct tree *branch);
 struct tree *get_branch(struct tree *root, int branch);
 
 
-void print(struct tree *str) {
-	int i = 0;
-	int len;
-
-	if (str == NULL)
-		return;
-
-	len = str->width;
-	switch(str->type) {
-		case CHAR:
-			putchar(str->data.c);
-			break;
-		case INT:
-			printf(\"%d\", str->data.i);
-			break;
-		case DOUBLE:
-			printf(\"%f\", str->data.d);
-			break;
-		case TREE:
-			print(str->data.t);
-			break;
-		default:
-			break;
-	}
-
-	while (i < len) {	
-		print(get_branch(str, i++));
-	}
-
-}
-
 void put_t(struct tree *str) {	
 
 	switch(str->type) {
@@ -101,6 +68,9 @@ void put_t(struct tree *str) {
 			break;
 		case DOUBLE:
 			printf(\"%f\", str->data.d);
+			break;
+		case TREE:
+			put_t(str->data.t);
 			break;
 		default:
 			break;
