@@ -23,7 +23,6 @@ let avt_to_svt = function
 |	Ast.Double -> Sast.Double
 |	Ast.String -> Sast.String
 |	Ast.Char -> Sast.Char
-|	Ast.Void -> Sast.Void
 |	Ast.Any	-> Sast.Any
 |	Ast.Bool -> Sast.Bool
 let matching t1 t2 = t1 == t2 || t1 == Sast.Any || t2 == Sast.Any
@@ -151,8 +150,7 @@ let translate prog =
 					|	Double -> Sast.FltLit("0.0"), Sast.Double
 					|	String -> Sast.StrLit("0"), Sast.String
 					|	Any -> Sast.IntLit("0"), Sast.Any
-					|	Bool -> Sast.IntLit("0"), Sast.Any
-					| Void -> Sast.Void, Sast.Void ) in
+					|	Bool -> Sast.IntLit("0"), Sast.Any) in
 		let locs = StringMap.add vn sexp StringMap.empty in
 		let svt (_, vt) = vt in
 		let funcs = StringMap.add s (svt sexp) env.functions in

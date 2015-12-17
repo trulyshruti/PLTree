@@ -40,7 +40,6 @@ vtype:
 |	DOUBLE		{Double}
 |	BOOL		{Bool}
 |	STRING		{String}
-|	VOID		{Void}
 |	ANY		{Any}
 
 
