@@ -65,7 +65,7 @@ let translate prog =
 		| _ -> [] in
 
 	let ret_types seq = let typeL = get_rets_list seq in let head = List.hd typeL in
-		List.for_all (fun t -> print_endline(Sast.string_of_vtype t); matching t head) typeL in
+		List.for_all (fun t -> matching t head) typeL in
 
 	(* environment -> Ast.expr -> (Sast.expr, Sast.vtype) *)
 	let rec expr env = function
@@ -170,8 +170,8 @@ let translate prog =
 		let locs = StringMap.add vn sexp StringMap.empty in
 		let svt (_, vt) = vt in
 		let funcs = StringMap.add s (svt sexp) env.functions in
-		let env = {env with globals=StringMap.empty; locals=locs; functions=funcs} in
-		let (_,seq) = transform_stmt env seq in let vars = get_vars_list seq in
+		let newenv = {env with globals=StringMap.empty; locals=locs; functions=funcs} in
+		let (_,seq) = transform_stmt newenv seq in let vars = get_vars_list seq in
 		let sameRetTs = ret_types seq in if sameRetTs then {env with functions=funcs}, 
 		Sast.FuncDec(s, (svt sexp), vn, seq,vars) else
 		raise(Failure(s ^ " must have consistent return types")) (* TODO *)
