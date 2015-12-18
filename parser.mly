@@ -21,9 +21,10 @@
 
 %right COL
 
+%right POUND
+
 %left ARROW
 
-%right POUND
 
 %start program
 %type < Ast.program> program

@@ -1,0 +1,44 @@
+print: any data [
+	int n #data;
+	int i 0;
+
+	put_t:data;
+
+	i = 0;
+
+	while: i < n [
+		print:data->i;
+		i = i + 1;
+	]
+
+	return:data;
+]
+
+pretty_print: any t [
+	int num_tabs t->0;
+	any data t->1;
+	int n #data;
+	int i 0;
+
+	if:num_tabs > 0 [
+		while: i < num_tabs [
+			print:"	";
+			i = i+1;
+		]
+	]
+
+	put_t:data;
+	print:"\n";
+
+	i = 0;
+
+	while: i < n [
+		pretty_print:[(num_tabs + 1) data->i];
+		i = i + 1;
+	]
+
+	return:[];
+]
+
+string str "hello\n";
+print : str;
