@@ -50,14 +50,20 @@ menhir:
 calculator.tar.gz : $(TARFILES)
 	cd .. && tar zcf calculator/calculator.tar.gz $(TARFILES:%=calculator/%)
 
-
-/usr/local/bin/pltree_std/stdio.tree: 
+/usr/local/bin/pltree_std/:
 	mkdir /usr/local/bin/pltree_std
+	
+/usr/local/bin/pltree_std/stdio.tree: stdio.tree /usr/local/bin/pltree_std/
 	cp stdio.tree /usr/local/bin/pltree_std
 
 .PHONY: install
 install: pltree /usr/local/bin/pltree_std/stdio.tree
 	cp pltree /usr/local/bin
+
+.PHONY: uninstall
+uninstall: clean
+	rm -rf /usr/local/bin/pltree_std
+	rm -f /usr/local/bin/pltree
 
 .PHONY : clean
 clean :
