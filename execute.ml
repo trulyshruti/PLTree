@@ -49,7 +49,7 @@ let transform prog =
 	| VarDec(t,s,e) -> Cast.VarDec((c_vtype t),s,expr e)
 	| Assn(s,e) -> Cast.Assn(s,expr e)
 	| Expr(e) -> Cast.Expr(expr e)
-	| Return(e) -> Cast.Return(expr e)
+	| Return(e,t) -> Cast.Return(expr e)
 	| Seq(l) -> let l = List.map (fun s -> stmt s) l in
 	Cast.Seq(l) in
 

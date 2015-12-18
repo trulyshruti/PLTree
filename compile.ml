@@ -50,6 +50,22 @@ let translate prog =
 			let l = Sast.Seq(tl) in hd::get_vars_list l
 			| _ -> get_vars_list(Sast.Seq(tl)))
 		| _ -> [] in
+	
+	let rec get_rets_list = function
+		Sast.Seq([]) -> []
+		| Sast.Seq(hd::tl) -> (match hd with Sast.Return(_,t) ->
+			let l = Sast.Seq(tl) in t::get_rets_list l
+			| Sast.While(_,seq,_) -> let l = Sast.Seq(tl) in
+				List.concat [get_rets_list seq; get_rets_list l]
+			| Sast.If(_,seq,_) -> let l = Sast.Seq(tl) in
+				List.concat [get_rets_list seq; get_rets_list l]
+			| Sast.IfElse(_,seq,seq2,_) -> let l = Sast.Seq(tl) in
+				List.concat [get_rets_list seq; get_rets_list seq2; get_rets_list l]
+			| _ -> get_rets_list(Sast.Seq(tl)))
+		| _ -> [] in
+
+	let ret_types seq = let typeL = get_rets_list seq in let head = List.hd typeL in
+		List.for_all (fun t -> print_endline(Sast.string_of_vtype t); matching t head) typeL in
 
 	(* environment -> Ast.expr -> (Sast.expr, Sast.vtype) *)
 	let rec expr env = function
@@ -120,7 +136,7 @@ let translate prog =
 	else if StringMap.mem s env.globals then
 		let (e1, e2) = StringMap.find s env.globals in (Sast.Id(s), e2)
 	else raise(Failure(s ^ " does not exist or is not visible")) in
-
+	
 	(* environment -> Ast.stmt -> (environment, Sast.stmt) *)
 	let rec transform_stmt env = function
 		(* Change Ast stuff to Sast and keep track of vars new to this scope *)
@@ -156,7 +172,9 @@ let translate prog =
 		let funcs = StringMap.add s (svt sexp) env.functions in
 		let env = {env with globals=StringMap.empty; locals=locs; functions=funcs} in
 		let (_,seq) = transform_stmt env seq in let vars = get_vars_list seq in
-		{env with functions=funcs}, Sast.FuncDec(s, (svt sexp), vn, seq,vars) (* TODO *)
+		let sameRetTs = ret_types seq in if sameRetTs then {env with functions=funcs}, 
+		Sast.FuncDec(s, (svt sexp), vn, seq,vars) else
+		raise(Failure(s ^ " must have consistent return types")) (* TODO *)
 	| VarDec(vt,s,e) -> if StringMap.mem s env.locals then
 	raise (Failure (s ^ " is already declared")) else let (r,t) = expr env e in
 	let locs = StringMap.add s (r,avt_to_svt vt) env.locals in {env with locals=locs},
@@ -172,7 +190,7 @@ let translate prog =
 		", not " ^ Sast.string_of_vtype t))
 
 	| Expr(e) -> env, let (e,_) = expr env e in Sast.Expr(e)
-	| Return(e) -> env, let (e,_) = expr env e in Sast.Return(e)
+	| Return(e) -> env, let (e,t) = expr env e in Sast.Return(e,t)
 	| Seq(l) -> let (env,l) = map_stmts env l in env, Sast.Seq(List.rev l) and
 
 	(* environment -> Ast.stmt list -> (environment, Sast.stmt list) *)

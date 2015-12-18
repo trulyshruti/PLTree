@@ -33,7 +33,7 @@ type stmt =
 |	VarDec of vtype * string * expr
 |	Assn of string * expr
 |	Expr of expr
-|	Return of expr
+|	Return of expr * vtype
 |	Seq of stmt list
 
 type program = stmt list
@@ -96,7 +96,7 @@ let rec string_of_stmt = function
 | VarDec(t,s,e) -> s ^ " " ^ string_of_expr e
 | Assn(s,e) -> s ^ " = " ^ string_of_expr e
 | Expr(e) -> string_of_expr e
-| Return(e) -> "return:(" ^ string_of_expr e ^ ")";
+| Return(e,t) -> "return:(" ^ string_of_expr e ^ ")";
 | Seq(l) ->  String.concat ", " (List.map string_of_stmt l)
 
 let string_of_program stmts =
