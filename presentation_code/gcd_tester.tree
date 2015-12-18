@@ -1,0 +1,6 @@
+$stdio.tree$
+$gcd.tree$
+
+
+print:[gcd:[14 21] "\n"];
+print:[gcdr:[12 6] "\n"];
