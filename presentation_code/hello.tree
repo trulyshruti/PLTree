@@ -1,0 +1,3 @@
+$stdio.tree$
+string str “hello\n”
+print : str;
