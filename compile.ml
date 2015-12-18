@@ -50,7 +50,7 @@ let translate prog =
 			let l = Sast.Seq(tl) in hd::get_vars_list l
 			| _ -> get_vars_list(Sast.Seq(tl)))
 		| _ -> [] in
-	
+
 	let rec get_rets_list = function
 		Sast.Seq([]) -> []
 		| Sast.Seq(hd::tl) -> (match hd with Sast.Return(_,t) ->
@@ -85,7 +85,7 @@ let translate prog =
 	| FunCall(s,e) -> if StringMap.mem s env.functions then
 	let vt = StringMap.find s env.functions in
 	let (e,t) = expr env e in if (vt == Sast.Any || t == vt) then Sast.FunCall(s,e), Sast.Any
-	else raise(Failure(s ^ " expects an argument of type " ^ 
+	else raise(Failure(s ^ " expects an argument of type " ^
 		Sast.string_of_vtype vt ^ ", not " ^ Sast.string_of_vtype t))
 	else raise(Failure(s ^ " does not exist or is not visible"))
 	| Eq(e1, e2) -> let (e1,t1) = expr env e1 in let (e2,t2) = expr env e2 in
@@ -93,7 +93,7 @@ let translate prog =
 	let type_string = Sast.string_of_vtype t1 ^ " == " ^ Sast.string_of_vtype t2 in
 	raise (Failure("Different types: " ^ type_string))
 	| Neq(e1, e2) -> let (e1,t1) = expr env e1 in let (e2,t2) = expr env e2 in
-	if (matching t1 t2) then Sast.Neq(e1,e2), Sast.Bool else 
+	if (matching t1 t2) then Sast.Neq(e1,e2), Sast.Bool else
 	let type_string = Sast.string_of_vtype t1 ^ " != " ^ Sast.string_of_vtype t2 in
 	raise (Failure("Different types: " ^ type_string))
 	| Lt(e1, e2) -> let (e1,t1) = expr env e1 in let (e2,t2) = expr env e2 in
@@ -136,7 +136,7 @@ let translate prog =
 	else if StringMap.mem s env.globals then
 		let (e1, e2) = StringMap.find s env.globals in (Sast.Id(s), e2)
 	else raise(Failure(s ^ " does not exist or is not visible")) in
-	
+
 	(* environment -> Ast.stmt -> (environment, Sast.stmt) *)
 	let rec transform_stmt env = function
 		(* Change Ast stuff to Sast and keep track of vars new to this scope *)
@@ -167,12 +167,13 @@ let translate prog =
 					|	String -> Sast.StrLit("0"), Sast.String
 					|	Any -> Sast.IntLit("0"), Sast.Any
 					|	Bool -> Sast.IntLit("0"), Sast.Any) in
-		let locs = StringMap.add vn sexp StringMap.empty in
+		if StringMap.mem s env.functions then raise(Failure(s ^ " is already declared"))
+		else let locs = StringMap.add vn sexp StringMap.empty in
 		let svt (_, vt) = vt in
 		let funcs = StringMap.add s (svt sexp) env.functions in
 		let newenv = {env with globals=StringMap.empty; locals=locs; functions=funcs} in
 		let (_,seq) = transform_stmt newenv seq in let vars = get_vars_list seq in
-		let sameRetTs = ret_types seq in if sameRetTs then {env with functions=funcs}, 
+		let sameRetTs = ret_types seq in if sameRetTs then {env with functions=funcs},
 		Sast.FuncDec(s, (svt sexp), vn, seq,vars) else
 		raise(Failure(s ^ " must have consistent return types")) (* TODO *)
 	| VarDec(vt,s,e) -> if StringMap.mem s env.locals then
