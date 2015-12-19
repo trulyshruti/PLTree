@@ -25,6 +25,8 @@ options='./pltree'
 # Make sure there's arguments
 if [ $# -eq 0 ]
 then
+	expdict='tests/output_res/'
+	exp='_res'
 	for f in $(ls $progdict)
 		do
 		# remove .tree extension
