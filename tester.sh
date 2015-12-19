@@ -16,6 +16,7 @@
 out='_out'
 exp='_exp'
 # define directories
+progdict='tests/programs/'
 outdict='tests/output_out/'
 expdict='tests/output_exp/'
 # define default option
@@ -24,8 +25,32 @@ options='./pltree'
 # Make sure there's arguments
 if [ $# -eq 0 ]
 then
-	echo 'usage: ./tester.sh [FILE.tree | treedir/]?'
-	exit 2;
+	for f in $(ls $progdict)
+		do
+		# remove .tree extension
+		progname="${f%.*}"
+		# Make sure an expected output file is present
+		if ! [ -a ${expdict}${progname}${exp} ]
+		then
+			echo "Place ${progname}${exp} file in ${expdict} directory."
+			exit 2;
+		else
+			# make all the files and save output
+			make $progdict$progname &> /dev/null
+			$progdict$progname > "${outdict}${progname}${out}"
+
+			# check if there are diffs
+			if ! [[ $(diff -bw ${outdict}${progname}${out} ${expdict}${progname}${exp}) ]]
+			then
+				printf "${progdict}${progname}: \033[0;32mSUCCESS\033[0m\n"
+			else
+				printf "${progdict}${progname}: \033[0;31mFAILED\033[0m\n"
+			fi
+
+			# clean directory of all non-.tree files
+			find $progdict ! -name "*.tree" -type f -delete
+		fi
+	done
 fi
 
 make_calc() {
