@@ -64,8 +64,8 @@ let translate prog =
 			| _ -> get_rets_list(Sast.Seq(tl)))
 		| _ -> [] in
 
-	let ret_types seq = let typeL = get_rets_list seq in let head = List.hd typeL in
-		List.for_all (fun t -> matching t head) typeL in
+	let ret_types seq = let typeL = get_rets_list seq in try let head = List.hd typeL in
+		List.for_all (fun t -> matching t head) typeL with Failure("hd") -> true in
 
 	(* environment -> Ast.expr -> (Sast.expr, Sast.vtype) *)
 	let rec expr env = function
