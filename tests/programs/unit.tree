@@ -1,0 +1,12 @@
+$stdio.tree$
+
+int a 2;
+double b 3.0;
+char c 'a';
+print: a;
+
+if: 2 > 1 [ return:3; ] 
+	else [ return:2; ]
+
+while: a < 6 [ 
+	a = a + 1; ]

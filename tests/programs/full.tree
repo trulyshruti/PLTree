@@ -1,0 +1,12 @@
+$stdio.tree$
+$pretty_tree.tree$
+
+int a 2;
+double b 3.0;
+char c 'a';
+
+char h 'h';
+char i 'i';
+char nl '\n';
+
+print : [h i nl];
